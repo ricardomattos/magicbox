@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { usersApi, planosApi } from "../../api/index.js";
-import { Card, Badge, Btn, Avatar, Modal, ConfirmModal, Input, Select, Spinner, C } from "../../components/ui.jsx";
+import { Card, Badge, Btn, Avatar, Modal, ConfirmModal, Input, Select, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const MONTH_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -97,6 +97,7 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function AlunosPage() {
+  const mobile = useIsMobile();
   const [alunos, setAlunos] = useState([]);
   const [planos, setPlanos] = useState([]);
   const [pagamentosMap, setPagamentosMap] = useState({});
@@ -179,8 +180,8 @@ export default function AlunosPage() {
   }
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Alunos</h2>
           <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>{alunos.length} aluno{alunos.length !== 1 ? "s" : ""} cadastrado{alunos.length !== 1 ? "s" : ""}</p>

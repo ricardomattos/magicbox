@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
 import { planosApi } from "../../api/index.js";
 import { useFetch } from "../../hooks/useFetch.js";
-import { Card, Btn, Modal, Input, Spinner, C } from "../../components/ui.jsx";
+import { Card, Btn, Modal, Input, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const COR_OPTS = ["#2979FF","#7c4dff","#00bcd4","#ff6d00","#e91e63","#00897b"];
 
 export default function PlanosPage() {
+  const mobile = useIsMobile();
   const { data, loading, refetch } = useFetch(() => planosApi.list(), []);
   const planos = data?.results || data || [];
 
@@ -35,8 +36,8 @@ export default function PlanosPage() {
   }
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Planos</h2>
         <Btn small onClick={() => { setForm({ nome:"",frequencia:"",valor:"",cor:C.blue }); setNovo(true); setErr(""); }}>+ Novo</Btn>
       </div>

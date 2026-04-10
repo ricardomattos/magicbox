@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { planosApi } from "../../api/index.js";
-import { Card, Badge, Avatar, Spinner, C } from "../../components/ui.jsx";
+import { Card, Badge, Avatar, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const MONTH_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -39,6 +39,7 @@ function getMeses(pagamentos, sinceKey) {
 
 export default function PlanoPage() {
   const { user } = useAuth();
+  const mobile = useIsMobile();
   const [pagamentos, setPagamentos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,8 +56,8 @@ export default function PlanoPage() {
   const meses = getMeses(pagamentos, sinceKey);
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 20px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Meu Plano</h2>
       </div>
 

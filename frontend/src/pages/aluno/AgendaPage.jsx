@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { horariosApi } from "../../api/index.js";
-import { Card, Badge, Avatar, Spinner, C } from "../../components/ui.jsx";
+import { Card, Badge, Avatar, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const DAYS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 
@@ -9,6 +9,7 @@ function todayStr() { return new Date().toISOString().split("T")[0]; }
 
 export default function AgendaPage() {
   const { user } = useAuth();
+  const mobile = useIsMobile();
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const now = new Date();
@@ -23,8 +24,8 @@ export default function AgendaPage() {
   const meuCheckinId = horarios.find(h => h.meu_checkin_id)?.meu_checkin_id;
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 18px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 18px" : "28px 0 18px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Agenda de Hoje</h2>
         <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 13 }}>
           {DAYS[now.getDay()]}, {now.toLocaleDateString("pt-BR", { day: "numeric", month: "long" })}

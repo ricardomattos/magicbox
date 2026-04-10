@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { configApi } from "../../api/index.js";
-import { Card, Btn, Select, Spinner, C } from "../../components/ui.jsx";
+import { Card, Btn, Select, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 export default function ConfigPage() {
+  const mobile = useIsMobile();
   const [config, setConfig] = useState(null);
   const [hour, setHour]     = useState(18);
   const [msg, setMsg]       = useState("");
@@ -28,8 +29,8 @@ export default function ConfigPage() {
   if (loading) return <Spinner />;
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 16px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 16px" : "28px 0 16px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Configurações</h2>
       </div>
 

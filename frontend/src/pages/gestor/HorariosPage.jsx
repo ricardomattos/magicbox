@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { horariosApi } from "../../api/index.js";
-import { Card, Btn, Modal, ConfirmModal, Avatar, Badge, Spinner, C } from "../../components/ui.jsx";
+import { Card, Btn, Modal, ConfirmModal, Avatar, Badge, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const DAYS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const NOW = new Date();
@@ -87,6 +87,7 @@ function CheckinDetailModal({ horario, onClose, onSaveVagas }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function HorariosPage() {
+  const mobile = useIsMobile();
   const [diaAtivo, setDiaAtivo] = useState(TODAY_PY === 6 ? 0 : TODAY_PY); // default Mon if weekend
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -155,8 +156,8 @@ export default function HorariosPage() {
   }
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 22px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 22px" : "28px 0 22px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Horários</h2>
         <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 12 }}>Grade semanal de aulas</p>
       </div>

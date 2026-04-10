@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { horariosApi, configApi, planosApi } from "../../api/index.js";
-import { Card, Badge, Btn, Avatar, C, StarLogo } from "../../components/ui.jsx";
+import { Card, Badge, Btn, Avatar, C, StarLogo, useIsMobile } from "../../components/ui.jsx";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
@@ -10,6 +10,7 @@ function curMonthKey() { const n=new Date(); return `${n.getFullYear()}-${String
 
 export default function HomePage({ setTab }) {
   const { user } = useAuth();
+  const mobile = useIsMobile();
   const [config, setConfig]   = useState(null);
   const [horarios, setHorarios] = useState([]);
   const [pagamentos, setPagamentos] = useState([]);
@@ -37,8 +38,8 @@ export default function HomePage({ setTab }) {
   const curYear  = now.getFullYear();
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 18px" : "28px 0 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <p style={{ margin: 0, color: C.muted, fontSize: 12, textTransform: "uppercase", letterSpacing: 1 }}>{saudacao},</p>
           <h2 style={{ margin: "2px 0 0", color: C.text, fontSize: 21, fontWeight: 900 }}>

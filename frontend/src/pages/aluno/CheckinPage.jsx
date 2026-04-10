@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { horariosApi, configApi, planosApi } from "../../api/index.js";
-import { Card, Badge, Btn, Spinner, StarLogo, C } from "../../components/ui.jsx";
+import { Card, Badge, Btn, Spinner, StarLogo, C, useIsMobile } from "../../components/ui.jsx";
 
 function todayStr()    { return new Date().toISOString().split("T")[0]; }
 function tomorrowStr() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split("T")[0]; }
@@ -9,6 +9,7 @@ function curMonthKey() { const n = new Date(); return `${n.getFullYear()}-${Stri
 
 export default function CheckinPage() {
   const { user, refreshUser } = useAuth();
+  const mobile = useIsMobile();
   const [tab, setTab]         = useState("today");
   const [config, setConfig]   = useState(null);
   const [horarios, setHorarios] = useState([]);
@@ -75,8 +76,8 @@ export default function CheckinPage() {
 
   // Blocked: payment overdue
   if (!mesAtualPago && !meuCheckin) return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 20px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Check-in</h2>
       </div>
       <Card style={{ borderColor: `${C.danger}40`, textAlign: "center", padding: "36px 20px" }}>
@@ -94,8 +95,8 @@ export default function CheckinPage() {
 
   // Confirmed
   if (meuCheckin) return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 20px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Check-in</h2>
       </div>
       <Card style={{ borderColor: `${C.success}40`, textAlign: "center", padding: "36px 20px" }}>
@@ -121,8 +122,8 @@ export default function CheckinPage() {
   );
 
   return (
-    <div style={{ padding: "0 18px 100px" }}>
-      <div style={{ padding: "56px 0 16px" }}>
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "56px 0 16px" : "28px 0 16px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Fazer Check-in</h2>
       </div>
 
