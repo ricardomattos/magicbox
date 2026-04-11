@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,6 +20,7 @@ class TemplateListCreateView(generics.ListCreateAPIView):
     queryset = HorarioTemplate.objects.filter(ativo=True)
     serializer_class = HorarioTemplateSerializer
     permission_classes = [IsGestor]
+    pagination_class = None
 
 
 class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -53,7 +54,12 @@ class ReplicarTemplateView(APIView):
 
 # ── Horarios (concrete slots) ───────────────────────────────────────────────────
 class HorarioListView(APIView):
-    """Returns slots for a specific date (default: today)."""
+    """Returns slots for a specific date (default: today).
+
+    Auto-generates concrete Horario rows from active HorarioTemplate records
+    the first time a date is queried, so students always see the weekly schedule
+    without the gestor needing to create slots manually.
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -63,9 +69,25 @@ class HorarioListView(APIView):
         except ValueError:
             return Response({"detail": "Data inválida. Use YYYY-MM-DD."}, status=400)
 
+        # Python weekday(): Mon=0 … Sun=6 — matches HorarioTemplate.dia_semana
+        dia_semana = data.weekday()
+        templates = HorarioTemplate.objects.filter(dia_semana=dia_semana, ativo=True)
+        for tmpl in templates:
+            Horario.objects.get_or_create(
+                data=data,
+                hora=tmpl.hora,
+                defaults={"vagas": tmpl.vagas},
+            )
+
         horarios = Horario.objects.filter(data=data).prefetch_related(
             "checkins__aluno__plano"
         )
+
+        # Alunos não veem horários que já passaram no dia de hoje
+        if data == date.today() and request.user.role != "gestor":
+            now_time = datetime.now().time()
+            horarios = horarios.filter(hora__gt=now_time)
+
         ser = HorarioSerializer(horarios, many=True, context={"request": request})
         return Response(ser.data)
 

@@ -229,6 +229,7 @@ export function BottomNav({ tab, setTab, isGestor, user, onLogout }) {
         position: "fixed", top: 0, left: 0, height: "100vh", width: 220, zIndex: 100,
         background: C.card, borderRight: `1px solid ${C.border}`,
         display: "flex", flexDirection: "column", padding: "24px 0",
+        boxSizing: "border-box",
       }}>
         {/* Logo */}
         <div style={{ padding: "0 20px 28px", display: "flex", alignItems: "center", gap: 10 }}>
