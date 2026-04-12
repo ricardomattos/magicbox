@@ -182,65 +182,155 @@ export default function AlunosPage() {
 
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+
+      {/* ── Header ── */}
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 16px" : "28px 0 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Alunos</h2>
-          <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>{alunos.length} aluno{alunos.length !== 1 ? "s" : ""} cadastrado{alunos.length !== 1 ? "s" : ""}</p>
+          <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>
+            {filtrados.length !== alunos.length
+              ? `${filtrados.length} de ${alunos.length} aluno${alunos.length !== 1 ? "s" : ""}`
+              : `${alunos.length} aluno${alunos.length !== 1 ? "s" : ""} cadastrado${alunos.length !== 1 ? "s" : ""}`}
+          </p>
         </div>
-        <Btn small onClick={() => { setForm({ name:"",email:"",phone:"",password:"",plano:"",must_change_pass:true }); setNovoAluno(true); setErr(""); }}>+ Novo</Btn>
+        <Btn small onClick={() => { setForm({ name:"",email:"",phone:"",password:"",plano:"",must_change_pass:true }); setNovoAluno(true); setErr(""); }}>+ Novo aluno</Btn>
       </div>
 
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nome, e-mail ou telefone..."
-        style={{ width: "100%", background: C.subtle, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 14px", color: C.text, fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
+      {/* ── Controls ── */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: mobile ? "wrap" : "nowrap" }}>
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar por nome, e-mail ou telefone..."
+          style={{ flex: 1, minWidth: 0, background: C.subtle, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 14px", color: C.text, fontFamily: "inherit", fontSize: 16, outline: "none", boxSizing: "border-box" }} />
+        <button onClick={() => setSoloInad(v => !v)}
+          style={{ flexShrink: 0, background: soloInad ? C.dangerDim : C.subtle, border: `1.5px solid ${soloInad ? C.danger : C.border}`, borderRadius: 12, padding: "10px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontFamily: "inherit", transition: "all 0.18s", whiteSpace: "nowrap" }}>
+          <span style={{ color: soloInad ? C.danger : C.muted, fontWeight: 700, fontSize: 13 }}>⚠️ Inadimplentes</span>
+          {inadCount > 0 && <Badge label={String(inadCount)} color={C.danger} />}
+        </button>
+      </div>
 
-      <button onClick={() => setSoloInad(v => !v)}
-        style={{ width: "100%", background: soloInad ? C.dangerDim : C.subtle, border: `1.5px solid ${soloInad ? C.danger : C.border}`, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", marginBottom: 14, transition: "all 0.18s" }}>
-        <span style={{ color: soloInad ? C.danger : C.muted, fontWeight: 700, fontSize: 13 }}>⚠️ Mostrar só inadimplentes</span>
-        {inadCount > 0 && <Badge label={`${inadCount} aluno${inadCount > 1 ? "s" : ""}`} color={C.danger} />}
-      </button>
-
-      {loading ? <Spinner /> : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {filtrados.length === 0 && (
-            <p style={{ color: C.muted, textAlign: "center", fontSize: 14, padding: "20px 0" }}>
-              {soloInad ? "Nenhum inadimplente encontrado 🎉" : "Nenhum aluno encontrado."}
-            </p>
-          )}
+      {/* ── Grid ── */}
+      {loading ? <Spinner /> : filtrados.length === 0 ? (
+        <p style={{ color: C.muted, textAlign: "center", fontSize: 14, padding: "40px 0" }}>
+          {soloInad ? "Nenhum inadimplente encontrado 🎉" : "Nenhum aluno encontrado."}
+        </p>
+      ) : (
+        <div style={mobile ? {
+          display: "flex", flexDirection: "column", gap: 8,
+        } : {
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))",
+          gap: 14,
+        }}>
           {filtrados.map(u => {
             const pags = pagamentosMap[u.id] || [];
             const mesAtualPago = pags.includes(curMonthKey());
             const inad = isInadimplente(pags, u.since_key);
             const plano = planos.find(p => p.id === u.plano);
-            return (
-              <Card key={u.id} style={{ borderColor: inad ? `${C.danger}35` : C.border }}>
-                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <div style={{ position: "relative" }}>
-                    <Avatar name={u.name} size={40} />
-                    {u.must_change_pass && <span style={{ position: "absolute", top: -2, right: -2, width: 10, height: 10, borderRadius: "50%", background: C.warn, border: `2px solid ${C.card}` }} />}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
-                      <p style={{ margin: 0, color: C.text, fontWeight: 700, fontSize: 14 }}>{u.name}</p>
-                      <div style={{ display: "flex", gap: 4 }}>
-                        {inad ? <Badge label="Inadimplente" color={C.danger} /> : <Badge label={mesAtualPago ? "Pago" : "Em aberto"} color={mesAtualPago ? C.success : C.blue} />}
+            const statusColor = inad ? C.danger : mesAtualPago ? C.success : C.blue;
+            const statusLabel = inad ? "Inadimplente" : mesAtualPago ? "Pago" : "Em aberto";
+
+            if (mobile) {
+              return (
+                <Card key={u.id} style={{ borderColor: inad ? `${C.danger}35` : C.border, padding: 0, overflow: "hidden" }}>
+                  <div style={{ height: 3, background: statusColor }} />
+                  <div style={{ padding: 16 }}>
+                    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                      <div style={{ position: "relative", flexShrink: 0 }}>
+                        <Avatar name={u.name} size={42} />
+                        {u.must_change_pass && <span style={{ position: "absolute", top: -2, right: -2, width: 10, height: 10, borderRadius: "50%", background: C.warn, border: `2px solid ${C.card}` }} />}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6 }}>
+                          <p style={{ margin: 0, color: C.text, fontWeight: 800, fontSize: 14, lineHeight: 1.3 }}>{u.name}</p>
+                          <Badge label={statusLabel} color={statusColor} />
+                        </div>
+                        <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 12 }}>{u.email}</p>
+                        {u.phone && (
+                          <a href={`https://wa.me/55${u.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+                            style={{ display: "inline-flex", alignItems: "center", gap: 4, color: C.success, fontSize: 12, textDecoration: "none", marginTop: 2 }}>
+                            💬 {u.phone}
+                          </a>
+                        )}
+                        <p style={{ margin: "2px 0 0", color: C.blue, fontSize: 12, fontWeight: 600 }}>{plano ? plano.nome : "Sem plano"}</p>
                       </div>
                     </div>
-                    <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>{u.email}</p>
-                    {u.phone && (
-                      <a href={`https://wa.me/55${u.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
-                        style={{ display: "inline-flex", alignItems: "center", gap: 4, color: C.success, fontSize: 12, textDecoration: "none", marginTop: 2 }}>
-                        <span>💬</span>{u.phone}
-                      </a>
-                    )}
-                    <p style={{ margin: "2px 0 0", color: C.blue, fontSize: 12 }}>{plano ? plano.nome : "Sem plano"}</p>
+                    <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+                      <Btn small variant="ghost" onClick={() => abrirEdicao(u)} style={{ flex: 1 }}>✏️ Editar</Btn>
+                      <Btn small variant="success" onClick={() => setPagModal(u)} style={{ flex: 1 }}>💰 Pgto</Btn>
+                      <Btn small variant="warn" onClick={() => setResetConfirm(u)} style={{ flex: 1 }}>🔑 Reset</Btn>
+                    </div>
                   </div>
+                </Card>
+              );
+            }
+
+            // ── Desktop card ──
+            return (
+              <div key={u.id} style={{
+                background: C.card, borderRadius: 18, overflow: "hidden",
+                border: `1px solid ${inad ? C.danger + "40" : C.border}`,
+                display: "flex", flexDirection: "column",
+                transition: "border-color 0.2s",
+              }}>
+                {/* Status accent */}
+                <div style={{ height: 3, background: statusColor, flexShrink: 0 }} />
+
+                {/* Body */}
+                <div style={{ padding: "18px 18px 14px", flex: 1, display: "flex", flexDirection: "column", gap: 0 }}>
+
+                  {/* Top row: avatar + badges */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                    <div style={{ position: "relative" }}>
+                      <Avatar name={u.name} size={48} />
+                      {u.must_change_pass && (
+                        <span title="Deve trocar a senha" style={{ position: "absolute", top: -2, right: -2, width: 12, height: 12, borderRadius: "50%", background: C.warn, border: `2px solid ${C.card}` }} />
+                      )}
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5 }}>
+                      <Badge label={statusLabel} color={statusColor} />
+                      {plano && <Badge label={plano.nome} color={C.blue} />}
+                    </div>
+                  </div>
+
+                  {/* Name */}
+                  <p style={{ margin: "0 0 2px", color: C.text, fontWeight: 800, fontSize: 15, lineHeight: 1.3 }}>{u.name}</p>
+
+                  {/* Email */}
+                  <p style={{ margin: "0 0 4px", color: C.muted, fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.email}</p>
+
+                  {/* Phone */}
+                  {u.phone ? (
+                    <a href={`https://wa.me/55${u.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 4, color: C.success, fontSize: 12, textDecoration: "none", marginBottom: 4 }}>
+                      💬 {u.phone}
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Sem telefone</span>
+                  )}
+
+                  {/* Treinos stats */}
+                  {(u.treinos_total > 0 || u.treinos_mes > 0) && (
+                    <div style={{ display: "flex", gap: 12, marginTop: 10, padding: "8px 12px", background: C.subtle, borderRadius: 10 }}>
+                      <div style={{ textAlign: "center" }}>
+                        <p style={{ margin: 0, color: C.text, fontWeight: 800, fontSize: 16 }}>{u.treinos_mes}</p>
+                        <p style={{ margin: 0, color: C.muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.3 }}>este mês</p>
+                      </div>
+                      <div style={{ width: 1, background: C.border }} />
+                      <div style={{ textAlign: "center" }}>
+                        <p style={{ margin: 0, color: C.text, fontWeight: 800, fontSize: 16 }}>{u.treinos_total}</p>
+                        <p style={{ margin: 0, color: C.muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.3 }}>total</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+
+                {/* Action bar */}
+                <div style={{ padding: "10px 14px", borderTop: `1px solid ${C.borderLight}`, display: "flex", gap: 6 }}>
                   <Btn small variant="ghost" onClick={() => abrirEdicao(u)} style={{ flex: 1 }}>✏️ Editar</Btn>
                   <Btn small variant="success" onClick={() => setPagModal(u)} style={{ flex: 1 }}>💰 Pgto</Btn>
                   <Btn small variant="warn" onClick={() => setResetConfirm(u)} style={{ flex: 1 }}>🔑 Reset</Btn>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
