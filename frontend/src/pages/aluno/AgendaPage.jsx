@@ -25,7 +25,7 @@ export default function AgendaPage() {
 
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "56px 0 18px" : "28px 0 18px" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 18px" : "28px 0 18px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Agenda de Hoje</h2>
         <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 13 }}>
           {DAYS[now.getDay()]}, {now.toLocaleDateString("pt-BR", { day: "numeric", month: "long" })}

@@ -157,7 +157,7 @@ export default function HorariosPage() {
 
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "56px 0 22px" : "28px 0 22px" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 22px" : "28px 0 22px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Horários</h2>
         <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 12 }}>Grade semanal de aulas</p>
       </div>

@@ -95,6 +95,27 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
   );
 }
 
+// ── Aluno Form — fora do AlunosPage para evitar remount a cada keystroke ──────
+function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err }) {
+  return (
+    <Modal onClose={onCancel} title={title}>
+      <Input label="Nome" value={form.name} onChange={v=>setF("name",v)} placeholder="Nome completo" />
+      <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
+      <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone",v)} placeholder="(16) 99999-9999" />
+      <Input label={editando ? "Nova senha (deixe em branco para manter)" : "Senha temporária"} type="password" value={form.password} onChange={v=>setF("password",v)} placeholder="Senha" hint={editando ? "" : "O aluno será solicitado a trocar no 1º acesso"} />
+      <Select label="Plano" value={String(form.plano||"")} onChange={v=>setF("plano",v)}>
+        <option value="">Sem plano</option>
+        {planos.map(p => <option key={p.id} value={String(p.id)}>{p.nome} — R${p.valor}</option>)}
+      </Select>
+      {err && <p style={{ color: C.danger, fontSize: 13, margin: "-6px 0 10px" }}>{err}</p>}
+      <div style={{ display: "flex", gap: 10 }}>
+        <Btn full variant="subtle" onClick={onCancel}>Cancelar</Btn>
+        <Btn full onClick={onSave}>Salvar</Btn>
+      </div>
+    </Modal>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function AlunosPage() {
   const mobile = useIsMobile();
@@ -159,29 +180,9 @@ export default function AlunosPage() {
     catch(e) { alert(e.message); }
   }
 
-  function AlunoForm({ title, onSave, onCancel }) {
-    return (
-      <Modal onClose={onCancel} title={title}>
-        <Input label="Nome" value={form.name} onChange={v=>setF("name",v)} placeholder="Nome completo" />
-        <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
-        <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone",v)} placeholder="(16) 99999-9999" />
-        <Input label={editando ? "Nova senha (deixe em branco para manter)" : "Senha temporária"} type="password" value={form.password} onChange={v=>setF("password",v)} placeholder="Senha" hint={editando ? "" : "O aluno será solicitado a trocar no 1º acesso"} />
-        <Select label="Plano" value={String(form.plano||"")} onChange={v=>setF("plano",v)}>
-          <option value="">Sem plano</option>
-          {planos.map(p => <option key={p.id} value={String(p.id)}>{p.nome} — R${p.valor}</option>)}
-        </Select>
-        {err && <p style={{ color: C.danger, fontSize: 13, margin: "-6px 0 10px" }}>{err}</p>}
-        <div style={{ display: "flex", gap: 10 }}>
-          <Btn full variant="subtle" onClick={onCancel}>Cancelar</Btn>
-          <Btn full onClick={onSave}>Salvar</Btn>
-        </div>
-      </Modal>
-    );
-  }
-
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "56px 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Alunos</h2>
           <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>{alunos.length} aluno{alunos.length !== 1 ? "s" : ""} cadastrado{alunos.length !== 1 ? "s" : ""}</p>
@@ -245,8 +246,8 @@ export default function AlunosPage() {
         </div>
       )}
 
-      {editando && <AlunoForm title="Editar aluno" onSave={salvarEdicao} onCancel={() => setEditando(null)} />}
-      {novoAluno && <AlunoForm title="Novo aluno" onSave={criarAluno} onCancel={() => setNovoAluno(false)} />}
+      {editando && <AlunoForm title="Editar aluno" onSave={salvarEdicao} onCancel={() => setEditando(null)} form={form} setF={setF} editando={editando} planos={planos} err={err} />}
+      {novoAluno && <AlunoForm title="Novo aluno" onSave={criarAluno} onCancel={() => setNovoAluno(false)} form={form} setF={setF} editando={editando} planos={planos} err={err} />}
       {pagModal && <PagamentosModal aluno={pagModal} planos={planos} onClose={() => setPagModal(null)} onRefresh={loadAll} />}
       {resetConfirm && (
         <ConfirmModal

@@ -37,7 +37,7 @@ export default function PlanosPage() {
 
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "56px 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 16px" : "28px 0 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Planos</h2>
         <Btn small onClick={() => { setForm({ nome:"",frequencia:"",valor:"",cor:C.blue }); setNovo(true); setErr(""); }}>+ Novo</Btn>
       </div>

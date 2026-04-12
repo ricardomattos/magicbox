@@ -111,7 +111,7 @@ export function Input({ label, value, onChange, type = "text", placeholder, hint
         placeholder={placeholder}
         style={{
           width: "100%", background: C.subtle, border: `1px solid ${C.border}`,
-          borderRadius: 12, padding: "12px 14px", color: C.text, fontSize: 15,
+          borderRadius: 12, padding: "12px 14px", color: C.text, fontSize: 16,
           fontFamily: "inherit", outline: "none", boxSizing: "border-box",
         }} />
       {hint && <p style={{ margin: "4px 0 0", color: C.muted, fontSize: 11 }}>{hint}</p>}
@@ -187,7 +187,9 @@ export function TopBar({ user, onLogout }) {
       width: "100%", maxWidth: 430, zIndex: 99,
       background: `${C.bg}ee`, backdropFilter: "blur(14px)",
       borderBottom: `1px solid ${C.border}`,
-      padding: "10px 16px", display: "flex", alignItems: "center", gap: 10,
+      paddingTop: "calc(env(safe-area-inset-top) + 10px)",
+      paddingBottom: "10px", paddingLeft: "16px", paddingRight: "16px",
+      display: "flex", alignItems: "center", gap: 10,
     }}>
       <StarLogo size={20} glow />
       <span style={{ fontWeight: 900, fontSize: 14, color: C.text, flex: 1 }}>

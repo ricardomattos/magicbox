@@ -57,7 +57,7 @@ export default function PlanoPage() {
 
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "56px 0 20px" : "28px 0 20px" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Meu Plano</h2>
       </div>
 
