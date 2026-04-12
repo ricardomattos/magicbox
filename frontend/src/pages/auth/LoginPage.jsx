@@ -37,14 +37,15 @@ export default function LoginPage() {
         <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Cross Training · Araraquara</p>
       </div>
 
-      <div style={{ width: "100%", maxWidth: 340 }}>
+      <form onSubmit={e => { e.preventDefault(); handle(); }}
+        style={{ width: "100%", maxWidth: 340 }}>
         <Input label="E-mail" value={email} onChange={setEmail} placeholder="seu@email.com" />
         <Input label="Senha" type="password" value={pass} onChange={setPass} placeholder="••••••" />
         {err && <p style={{ color: C.danger, fontSize: 13, margin: "-6px 0 12px" }}>{err}</p>}
         <Btn full onClick={handle} disabled={loading}>
           {loading ? "Entrando..." : "Entrar"}
         </Btn>
-      </div>
+      </form>
     </div>
   );
 }

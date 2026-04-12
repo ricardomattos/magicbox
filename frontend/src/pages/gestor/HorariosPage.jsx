@@ -3,11 +3,8 @@ import { horariosApi } from "../../api/index.js";
 import { Card, Btn, Modal, ConfirmModal, Avatar, Badge, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const DAYS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-const NOW = new Date();
 // Backend uses Python weekday: 0=Mon…6=Sun; JS: 0=Sun…6=Sat
-// We map: JS Sunday(0)→6, Mon(1)→0, …Sat(6)→5
-const JS_TO_PY = [6,0,1,2,3,4,5];
-const TODAY_PY  = JS_TO_PY[NOW.getDay()];
+function getTodayPY() { return [6,0,1,2,3,4,5][new Date().getDay()]; }
 const HORAS = Array.from({length:41},(_,i)=>{const h=Math.floor(i/2)+5,m=i%2===0?"00":"30";return `${String(h).padStart(2,"0")}:${m}`;});
 
 function todayStr() { return new Date().toISOString().split("T")[0]; }
@@ -88,7 +85,7 @@ function CheckinDetailModal({ horario, onClose, onSaveVagas }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function HorariosPage() {
   const mobile = useIsMobile();
-  const [diaAtivo, setDiaAtivo] = useState(TODAY_PY);
+  const [diaAtivo, setDiaAtivo] = useState(getTodayPY);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [novaHora, setNovaHora] = useState("06:00");
