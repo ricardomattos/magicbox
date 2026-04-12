@@ -7,8 +7,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# The dist folder is consumed by the nginx service via Docker volume
+# Init container: copies dist to shared volume and exits
 FROM alpine:latest
 COPY --from=builder /app/dist /app/dist
-VOLUME /app/dist
-CMD ["sh", "-c", "cp -r /app/dist/. /output/ && echo 'Frontend build copied'"]
+CMD ["sh", "-c", "cp -r /app/dist/. /output/ && echo '[frontend] build copied to volume'"]
