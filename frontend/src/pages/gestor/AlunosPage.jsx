@@ -95,13 +95,20 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
   );
 }
 
+function maskPhone(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2)  return digits.replace(/^(\d{0,2})/, "($1");
+  if (digits.length <= 7)  return digits.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+  return digits.replace(/^(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+}
+
 // ── Aluno Form — fora do AlunosPage para evitar remount a cada keystroke ──────
 function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err }) {
   return (
     <Modal onClose={onCancel} title={title}>
       <Input label="Nome" value={form.name} onChange={v=>setF("name",v)} placeholder="Nome completo" />
       <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
-      <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone",v)} placeholder="(16) 99999-9999" />
+      <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone", maskPhone(v))} placeholder="(16) 99999-9999" />
       <Input label={editando ? "Nova senha (deixe em branco para manter)" : "Senha temporária"} type="password" value={form.password} onChange={v=>setF("password",v)} placeholder="Senha" hint={editando ? "" : "O aluno será solicitado a trocar no 1º acesso"} />
       <Select label="Plano" value={String(form.plano||"")} onChange={v=>setF("plano",v)}>
         <option value="">Sem plano</option>
