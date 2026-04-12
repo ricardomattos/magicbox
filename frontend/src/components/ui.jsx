@@ -179,37 +179,48 @@ export function ConfirmModal({ label, onConfirm, onCancel, variant = "danger" })
 
 export function TopBar({ user, onLogout }) {
   const mobile = useIsMobile();
-  // No desktop com sidebar, a topbar não é necessária (a sidebar já tem logo e logout)
+  const [confirm, setConfirm] = useState(false);
   if (!mobile) return null;
   return (
-    <div style={{
-      position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)",
-      width: "100%", maxWidth: 430, zIndex: 99,
-      background: `${C.bg}ee`, backdropFilter: "blur(14px)",
-      borderBottom: `1px solid ${C.border}`,
-      paddingTop: "calc(env(safe-area-inset-top) + 10px)",
-      paddingBottom: "10px", paddingLeft: "16px", paddingRight: "16px",
-      display: "flex", alignItems: "center", gap: 10,
-    }}>
-      <StarLogo size={20} glow />
-      <span style={{ fontWeight: 900, fontSize: 14, color: C.text, flex: 1 }}>
-        MAGIC BOX <span style={{ color: C.muted, fontWeight: 400 }}>Cross Training</span>
-      </span>
-      {user && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {user.role === "gestor" && <Badge label="Gestor" color={C.warn} />}
-          <button onClick={onLogout} title="Sair"
-            style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 18, padding: 0 }}>
-            ⏏
-          </button>
-        </div>
+    <>
+      <div style={{
+        position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)",
+        width: "100%", maxWidth: 430, zIndex: 99,
+        background: `${C.bg}ee`, backdropFilter: "blur(14px)",
+        borderBottom: `1px solid ${C.border}`,
+        paddingTop: "calc(env(safe-area-inset-top) + 10px)",
+        paddingBottom: "10px", paddingLeft: "16px", paddingRight: "16px",
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        <StarLogo size={20} glow />
+        <span style={{ fontWeight: 900, fontSize: 14, color: C.text, flex: 1 }}>
+          MAGIC BOX <span style={{ color: C.muted, fontWeight: 400 }}>Cross Training</span>
+        </span>
+        {user && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {user.role === "gestor" && <Badge label="Gestor" color={C.warn} />}
+            <button onClick={() => setConfirm(true)} title="Sair"
+              style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 18, padding: 0 }}>
+              ⏏
+            </button>
+          </div>
+        )}
+      </div>
+      {confirm && (
+        <ConfirmModal
+          label="Deseja sair?"
+          variant="danger"
+          onConfirm={onLogout}
+          onCancel={() => setConfirm(false)}
+        />
       )}
-    </div>
+    </>
   );
 }
 
 export function BottomNav({ tab, setTab, isGestor, user, onLogout }) {
   const mobile = useIsMobile();
+  const [confirm, setConfirm] = useState(false);
   const items = isGestor
     ? [
         { id: "g_horarios", label: "Horários", icon: "📅" },
@@ -270,13 +281,21 @@ export function BottomNav({ tab, setTab, isGestor, user, onLogout }) {
                 {user.role === "gestor" && <Badge label="Gestor" color={C.warn} />}
               </div>
             </div>
-            <button onClick={onLogout} style={{
+            <button onClick={() => setConfirm(true)} style={{
               width: "100%", padding: "8px 12px", border: "none", borderRadius: 10,
               background: C.subtle, cursor: "pointer", color: C.muted,
               fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left",
             }}>
               ⏏ Sair
             </button>
+            {confirm && (
+              <ConfirmModal
+                label="Deseja sair?"
+                variant="danger"
+                onConfirm={onLogout}
+                onCancel={() => setConfirm(false)}
+              />
+            )}
           </div>
         )}
       </nav>

@@ -88,7 +88,7 @@ function CheckinDetailModal({ horario, onClose, onSaveVagas }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function HorariosPage() {
   const mobile = useIsMobile();
-  const [diaAtivo, setDiaAtivo] = useState(TODAY_PY >= 5 ? 0 : TODAY_PY); // Sáb(5) e Dom(6) → Seg(0)
+  const [diaAtivo, setDiaAtivo] = useState(TODAY_PY);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [novaHora, setNovaHora] = useState("06:00");
