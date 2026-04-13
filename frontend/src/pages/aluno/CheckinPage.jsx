@@ -14,6 +14,7 @@ export default function CheckinPage() {
   const [config, setConfig]   = useState(null);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPagamento, setLoadingPagamento] = useState(true);
   const [sel, setSel]         = useState(null);
   const [acting, setActing]   = useState(false);
   const [mesAtualPago, setMesAtualPago] = useState(false);
@@ -25,7 +26,10 @@ export default function CheckinPage() {
     if (user) {
       planosApi.getPagamentos(user.id)
         .then(d => setMesAtualPago((d.meses_pagos || []).includes(curMonthKey())))
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => setLoadingPagamento(false));
+    } else {
+      setLoadingPagamento(false);
     }
   }, [user]);
 
@@ -73,6 +77,16 @@ export default function CheckinPage() {
       setActing(false);
     }
   }
+
+  // Show spinner while payment status is still loading
+  if (loadingPagamento || (loading && !meuCheckin)) return (
+    <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 20px" : "28px 0 20px" }}>
+        <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Check-in</h2>
+      </div>
+      <Spinner />
+    </div>
+  );
 
   // Blocked: payment overdue
   if (!mesAtualPago && !meuCheckin) return (
