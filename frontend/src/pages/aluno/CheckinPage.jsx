@@ -14,22 +14,19 @@ export default function CheckinPage() {
   const [config, setConfig]   = useState(null);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingPagamento, setLoadingPagamento] = useState(true);
   const [sel, setSel]         = useState(null);
   const [acting, setActing]   = useState(false);
-  const [mesAtualPago, setMesAtualPago] = useState(false);
+  const [mesAtualPago, setMesAtualPago] = useState(null); // null = ainda carregando
 
   const hora = new Date().getHours();
 
   useEffect(() => {
     configApi.get().then(setConfig).catch(() => {});
     if (user) {
+      setMesAtualPago(null); // reseta ao re-executar (ex: refresh do user)
       planosApi.getPagamentos(user.id)
         .then(d => setMesAtualPago((d.meses_pagos || []).includes(curMonthKey())))
-        .catch(() => {})
-        .finally(() => setLoadingPagamento(false));
-    } else {
-      setLoadingPagamento(false);
+        .catch(() => setMesAtualPago(false));
     }
   }, [user]);
 
@@ -78,8 +75,8 @@ export default function CheckinPage() {
     }
   }
 
-  // Show spinner while payment status is still loading
-  if (loadingPagamento || (loading && !meuCheckin)) return (
+  // Show spinner while payment status or horarios are still loading
+  if (mesAtualPago === null || loading) return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
       <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Check-in</h2>
