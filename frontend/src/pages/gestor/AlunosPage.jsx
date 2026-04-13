@@ -102,6 +102,48 @@ function maskPhone(value) {
   return digits.replace(/^(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
 }
 
+// ── Plan Picker ───────────────────────────────────────────────────────────────
+function PlanPicker({ value, onChange, planos }) {
+  const selected = String(value || "");
+  const options = [{ id: "", nome: "Sem plano", valor: null }, ...planos];
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <p style={{ margin: "0 0 8px", color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        Plano
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {options.map(p => {
+          const active = String(p.id) === selected;
+          return (
+            <button key={p.id} type="button" onClick={() => onChange(String(p.id))}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                width: "100%", padding: "11px 14px", borderRadius: 12, cursor: "pointer",
+                fontFamily: "inherit", fontSize: 14, textAlign: "left",
+                background: active ? C.blueDim : C.subtle,
+                border: `1.5px solid ${active ? C.blue : C.border}`,
+                color: active ? C.text : C.muted,
+                transition: "border-color 0.15s, background 0.15s",
+              }}>
+              <span style={{ fontWeight: active ? 600 : 400, color: p.id === "" ? C.muted : C.text }}>
+                {p.nome}
+              </span>
+              {p.valor != null && (
+                <span style={{ fontSize: 13, fontWeight: 700, color: active ? C.blue : C.muted }}>
+                  R$ {Number(p.valor).toFixed(2).replace(".", ",")}
+                </span>
+              )}
+              {active && (
+                <span style={{ marginLeft: 8, color: C.blue, fontSize: 16, lineHeight: 1 }}>✓</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Aluno Form — fora do AlunosPage para evitar remount a cada keystroke ──────
 function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err }) {
   return (
@@ -110,10 +152,7 @@ function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err 
       <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
       <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone", maskPhone(v))} placeholder="(16) 99999-9999" />
       <Input label={editando ? "Nova senha (deixe em branco para manter)" : "Senha temporária"} type="password" value={form.password} onChange={v=>setF("password",v)} placeholder="Senha" hint={editando ? "" : "O aluno será solicitado a trocar no 1º acesso"} />
-      <Select label="Plano" value={String(form.plano||"")} onChange={v=>setF("plano",v)}>
-        <option value="">Sem plano</option>
-        {planos.map(p => <option key={p.id} value={String(p.id)}>{p.nome} — R${p.valor}</option>)}
-      </Select>
+      <PlanPicker value={form.plano} onChange={v=>setF("plano",v)} planos={planos} />
       {err && <p style={{ color: C.danger, fontSize: 13, margin: "-6px 0 10px" }}>{err}</p>}
       <div style={{ display: "flex", gap: 10 }}>
         <Btn full variant="subtle" onClick={onCancel}>Cancelar</Btn>
