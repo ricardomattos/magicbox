@@ -202,6 +202,7 @@ export default function AlunosPage() {
   const [inviteCopied, setInviteCopied] = useState(false);
   const [pagModal, setPagModal] = useState(null);
   const [resetConfirm, setResetConfirm] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [form, setForm] = useState({ name:"", email:"", phone:"", password:"", plano:"", must_change_pass:true });
   const [err, setErr] = useState("");
   const setF = (k,v) => setForm(p => ({...p,[k]:v}));
@@ -331,8 +332,8 @@ export default function AlunosPage() {
 
             if (mobile) {
               return (
-                <Card key={u.id} style={{ borderColor: inad ? `${C.danger}35` : C.border, padding: 0, overflow: "hidden" }}>
-                  <div style={{ height: 3, background: statusColor }} />
+                <Card key={u.id} style={{ borderColor: inad ? `${C.danger}35` : C.border, padding: 0, overflow: "visible" }}>
+                  <div style={{ height: 3, background: statusColor, borderRadius: "inherit inherit 0 0" }} />
                   <div style={{ padding: 16 }}>
                     <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                       <div style={{ position: "relative", flexShrink: 0 }}>
@@ -341,8 +342,28 @@ export default function AlunosPage() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6 }}>
-                          <p style={{ margin: 0, color: C.text, fontWeight: 800, fontSize: 14, lineHeight: 1.3 }}>{u.name}</p>
-                          <Badge label={statusLabel} color={statusColor} />
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                            <p style={{ margin: 0, color: C.text, fontWeight: 800, fontSize: 14, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name}</p>
+                            <Badge label={statusLabel} color={statusColor} />
+                          </div>
+                          {/* ⋮ menu */}
+                          <div style={{ position: "relative", flexShrink: 0 }}>
+                            <button onClick={() => setOpenMenuId(openMenuId === u.id ? null : u.id)}
+                              style={{ background: "none", border: "none", cursor: "pointer", padding: "2px 6px", borderRadius: 8, color: C.muted, fontSize: 18, lineHeight: 1, fontWeight: 700, letterSpacing: 1 }}>
+                              ⋮
+                            </button>
+                            {openMenuId === u.id && (
+                              <>
+                                <div onClick={() => setOpenMenuId(null)} style={{ position: "fixed", inset: 0, zIndex: 10 }} />
+                                <div style={{ position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 20, background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 6, minWidth: 160, boxShadow: "0 8px 24px rgba(0,0,0,0.35)" }}>
+                                  <button onClick={() => { setOpenMenuId(null); setResetConfirm(u); }}
+                                    style={{ width: "100%", background: "none", border: "none", cursor: "pointer", padding: "10px 12px", borderRadius: 8, color: C.warn, fontSize: 13, fontWeight: 600, fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}>
+                                    🔑 Resetar senha
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
                         </div>
                         <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 12 }}>{u.email}</p>
                         {u.phone && (
@@ -354,10 +375,9 @@ export default function AlunosPage() {
                         <p style={{ margin: "2px 0 0", color: C.blue, fontSize: 12, fontWeight: 600 }}>{plano ? plano.nome : "Sem plano"}</p>
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+                    <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                       <Btn small variant="ghost" onClick={() => abrirEdicao(u)} style={{ flex: 1 }}>✏️ Editar</Btn>
-                      <Btn small variant="success" onClick={() => setPagModal(u)} style={{ flex: 1 }}>💰 Pgto</Btn>
-                      <Btn small variant="warn" onClick={() => setResetConfirm(u)} style={{ flex: 1 }}>🔑 Reset</Btn>
+                      <Btn small variant="success" onClick={() => setPagModal(u)} style={{ flex: 1 }}>💰 Pagamentos</Btn>
                     </div>
                   </div>
                 </Card>
@@ -367,19 +387,38 @@ export default function AlunosPage() {
             // ── Desktop card ──
             return (
               <div key={u.id} style={{
-                background: C.card, borderRadius: 18, overflow: "hidden",
+                background: C.card, borderRadius: 18, overflow: "visible",
                 border: `1px solid ${inad ? C.danger + "40" : C.border}`,
                 display: "flex", flexDirection: "column",
-                transition: "border-color 0.2s",
+                transition: "border-color 0.2s", position: "relative",
               }}>
                 {/* Status accent */}
-                <div style={{ height: 3, background: statusColor, flexShrink: 0 }} />
+                <div style={{ height: 3, background: statusColor, borderRadius: "18px 18px 0 0", flexShrink: 0 }} />
+
+                {/* ⋮ menu */}
+                <div style={{ position: "absolute", top: 10, right: 12, zIndex: 5 }}>
+                  <button onClick={() => setOpenMenuId(openMenuId === u.id ? null : u.id)}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 8px", borderRadius: 8, color: C.muted, fontSize: 20, lineHeight: 1, fontWeight: 700, letterSpacing: 1 }}>
+                    ⋮
+                  </button>
+                  {openMenuId === u.id && (
+                    <>
+                      <div onClick={() => setOpenMenuId(null)} style={{ position: "fixed", inset: 0, zIndex: 10 }} />
+                      <div style={{ position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 20, background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 6, minWidth: 170, boxShadow: "0 8px 24px rgba(0,0,0,0.35)" }}>
+                        <button onClick={() => { setOpenMenuId(null); setResetConfirm(u); }}
+                          style={{ width: "100%", background: "none", border: "none", cursor: "pointer", padding: "10px 12px", borderRadius: 8, color: C.warn, fontSize: 13, fontWeight: 600, fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}>
+                          🔑 Resetar senha
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
 
                 {/* Body */}
                 <div style={{ padding: "18px 18px 14px", flex: 1, display: "flex", flexDirection: "column", gap: 0 }}>
 
                   {/* Top row: avatar + badges */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, paddingRight: 28 }}>
                     <div style={{ position: "relative" }}>
                       <Avatar name={u.name} size={48} />
                       {u.must_change_pass && (
@@ -425,10 +464,9 @@ export default function AlunosPage() {
                 </div>
 
                 {/* Action bar */}
-                <div style={{ padding: "10px 14px", borderTop: `1px solid ${C.borderLight}`, display: "flex", gap: 6 }}>
+                <div style={{ padding: "10px 14px", borderTop: `1px solid ${C.borderLight}`, display: "flex", gap: 8 }}>
                   <Btn small variant="ghost" onClick={() => abrirEdicao(u)} style={{ flex: 1 }}>✏️ Editar</Btn>
-                  <Btn small variant="success" onClick={() => setPagModal(u)} style={{ flex: 1 }}>💰 Pgto</Btn>
-                  <Btn small variant="warn" onClick={() => setResetConfirm(u)} style={{ flex: 1 }}>🔑 Reset</Btn>
+                  <Btn small variant="success" onClick={() => setPagModal(u)} style={{ flex: 1 }}>💰 Pagamentos</Btn>
                 </div>
               </div>
             );
