@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { usersApi, planosApi } from "../../api/index.js";
+import { usersApi, planosApi, inviteApi } from "../../api/index.js";
 import { Card, Badge, Btn, Avatar, Modal, ConfirmModal, Input, Select, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -145,9 +145,38 @@ function PlanPicker({ value, onChange, planos }) {
 }
 
 // ── Aluno Form — fora do AlunosPage para evitar remount a cada keystroke ──────
-function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err }) {
+function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err, inviteUrl, inviteCopied, onCopyLink, onRegenLink }) {
   return (
     <Modal onClose={onCancel} title={title}>
+      {/* Link de cadastro (só no modo "novo aluno") */}
+      {!editando && (
+        <div style={{ marginBottom: 18, padding: "12px 14px", background: C.subtle, borderRadius: 14, border: `1px solid ${C.border}` }}>
+          <p style={{ margin: "0 0 6px", color: C.text, fontSize: 13, fontWeight: 700 }}>🔗 Link de cadastro</p>
+          <p style={{ margin: "0 0 10px", color: C.muted, fontSize: 12 }}>
+            Envie este link para o aluno se cadastrar sozinho, escolhendo o próprio plano.
+          </p>
+          {inviteUrl ? (
+            <>
+              <div style={{ background: C.bg, borderRadius: 10, padding: "8px 12px", marginBottom: 8, wordBreak: "break-all" }}>
+                <p style={{ margin: 0, color: C.blue, fontSize: 12, fontFamily: "monospace" }}>{inviteUrl}</p>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Btn small variant={inviteCopied ? "success" : "ghost"} onClick={onCopyLink} style={{ flex: 1 }}>
+                  {inviteCopied ? "✓ Copiado!" : "Copiar link"}
+                </Btn>
+                <Btn small variant="subtle" onClick={onRegenLink}>Novo link</Btn>
+              </div>
+            </>
+          ) : (
+            <p style={{ margin: 0, color: C.muted, fontSize: 12 }}>Carregando link...</p>
+          )}
+          <div style={{ margin: "14px 0 0", height: 1, background: C.border }} />
+          <p style={{ margin: "12px 0 0", color: C.muted, fontSize: 11, textAlign: "center" }}>
+            ou preencha o formulário abaixo para cadastrar manualmente
+          </p>
+        </div>
+      )}
+
       <Input label="Nome" value={form.name} onChange={v=>setF("name",v)} placeholder="Nome completo" />
       <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
       <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone", maskPhone(v))} placeholder="(16) 99999-9999" />
@@ -173,11 +202,39 @@ export default function AlunosPage() {
   const [soloInad, setSoloInad] = useState(false);
   const [editando, setEditando] = useState(null);
   const [novoAluno, setNovoAluno] = useState(false);
+  const [inviteUrl, setInviteUrl] = useState("");
+  const [inviteCopied, setInviteCopied] = useState(false);
   const [pagModal, setPagModal] = useState(null);
   const [resetConfirm, setResetConfirm] = useState(null);
   const [form, setForm] = useState({ name:"", email:"", phone:"", password:"", plano:"", must_change_pass:true });
   const [err, setErr] = useState("");
   const setF = (k,v) => setForm(p => ({...p,[k]:v}));
+
+  async function abrirNovoAluno() {
+    setForm({ name:"", email:"", phone:"", password:"", plano:"", must_change_pass:true });
+    setErr("");
+    setInviteUrl("");
+    setNovoAluno(true);
+    try {
+      const { token } = await inviteApi.get();
+      setInviteUrl(`${window.location.origin}/cadastro/${token}`);
+    } catch { /* link indisponível, não bloqueia o form */ }
+  }
+
+  async function regenerarLink() {
+    try {
+      const { token } = await inviteApi.regenerate();
+      setInviteUrl(`${window.location.origin}/cadastro/${token}`);
+      setInviteCopied(false);
+    } catch(e) { alert(e.message); }
+  }
+
+  function copiarLink() {
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      setInviteCopied(true);
+      setTimeout(() => setInviteCopied(false), 2000);
+    });
+  }
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -239,7 +296,7 @@ export default function AlunosPage() {
               : `${alunos.length} aluno${alunos.length !== 1 ? "s" : ""} cadastrado${alunos.length !== 1 ? "s" : ""}`}
           </p>
         </div>
-        <Btn small onClick={() => { setForm({ name:"",email:"",phone:"",password:"",plano:"",must_change_pass:true }); setNovoAluno(true); setErr(""); }}>+ Novo aluno</Btn>
+        <Btn small onClick={abrirNovoAluno}>+ Novo aluno</Btn>
       </div>
 
       {/* ── Controls ── */}
@@ -383,7 +440,7 @@ export default function AlunosPage() {
       )}
 
       {editando && <AlunoForm title="Editar aluno" onSave={salvarEdicao} onCancel={() => setEditando(null)} form={form} setF={setF} editando={editando} planos={planos} err={err} />}
-      {novoAluno && <AlunoForm title="Novo aluno" onSave={criarAluno} onCancel={() => setNovoAluno(false)} form={form} setF={setF} editando={editando} planos={planos} err={err} />}
+      {novoAluno && <AlunoForm title="Novo aluno" onSave={criarAluno} onCancel={() => setNovoAluno(false)} form={form} setF={setF} editando={null} planos={planos} err={err} inviteUrl={inviteUrl} inviteCopied={inviteCopied} onCopyLink={copiarLink} onRegenLink={regenerarLink} />}
       {pagModal && <PagamentosModal aluno={pagModal} planos={planos} onClose={() => setPagModal(null)} onRefresh={loadAll} />}
       {resetConfirm && (
         <ConfirmModal

@@ -1,3 +1,4 @@
+import uuid
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +8,11 @@ from .models import User
 from .serializers import (
     UserSerializer, UserCreateSerializer,
     ChangePasswordSerializer, ResetPasswordSerializer,
+    PublicRegisterSerializer,
 )
+from apps.config_box.models import BoxConfig
+from apps.planos.models import Plano
+from apps.planos.serializers import PlanoSerializer
 
 
 class IsGestor(permissions.BasePermission):
@@ -77,3 +82,50 @@ class ResetPasswordView(APIView):
         ser.is_valid(raise_exception=True)
         ser.update(user, ser.validated_data)
         return Response({"detail": "Senha resetada. O aluno deverá criar uma nova senha no próximo acesso."})
+
+
+class InviteView(APIView):
+    """Gestor-only: retrieve or regenerate the box invite token."""
+    permission_classes = [IsGestor]
+
+    def get(self, request):
+        config = BoxConfig.get()
+        return Response({"token": str(config.invite_token)})
+
+    def post(self, request):
+        config = BoxConfig.get()
+        config.invite_token = uuid.uuid4()
+        config.save(update_fields=["invite_token"])
+        return Response({"token": str(config.invite_token)})
+
+
+class PublicRegisterView(APIView):
+    """Public: validate invite token, list plans, and register a student."""
+    permission_classes = [permissions.AllowAny]
+
+    def _validate_token(self, token):
+        try:
+            uuid.UUID(token)
+        except ValueError:
+            return None
+        config = BoxConfig.get()
+        if str(config.invite_token) != token:
+            return None
+        return config
+
+    def get(self, request, token):
+        if not self._validate_token(token):
+            return Response({"detail": "Link de cadastro inválido."}, status=400)
+        planos = Plano.objects.filter(ativo=True)
+        return Response({
+            "valid": True,
+            "planos": PlanoSerializer(planos, many=True).data,
+        })
+
+    def post(self, request, token):
+        if not self._validate_token(token):
+            return Response({"detail": "Link de cadastro inválido."}, status=400)
+        ser = PublicRegisterSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response({"detail": "Cadastro realizado! Faça login para acessar o app."}, status=201)

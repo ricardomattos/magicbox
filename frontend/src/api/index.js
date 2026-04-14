@@ -65,3 +65,15 @@ export const configApi = {
   get: () => api.get("/config/"),
   update: (data) => api.patch("/config/", data),
 };
+
+// ── Invite (gestor) ───────────────────────────────────────────────────────────
+export const inviteApi = {
+  get: () => api.get("/users/invite/"),
+  regenerate: () => api.post("/users/invite/"),
+};
+
+// ── Public registration (no auth needed) ──────────────────────────────────────
+export const registerApi = {
+  validate: (token) => api.get(`/users/register/${token}/`),
+  register: (token, data) => api.post(`/users/register/${token}/`, data),
+};

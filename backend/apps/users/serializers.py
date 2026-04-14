@@ -62,6 +62,29 @@ class ResetPasswordSerializer(serializers.Serializer):
         return instance
 
 
+class PublicRegisterSerializer(serializers.Serializer):
+    name     = serializers.CharField(max_length=150)
+    email    = serializers.EmailField()
+    password = serializers.CharField(min_length=6)
+    phone    = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    plano    = serializers.IntegerField(required=False, allow_null=True)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Este e-mail já está cadastrado.")
+        return value
+
+    def create(self, validated_data):
+        plano_id = validated_data.pop("plano", None)
+        password = validated_data.pop("password")
+        user = User(role="aluno", must_change_pass=False, **validated_data)
+        if plano_id:
+            user.plano_id = plano_id
+        user.set_password(password)
+        user.save()
+        return user
+
+
 class LoginResponseSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()

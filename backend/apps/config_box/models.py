@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 
@@ -6,6 +7,7 @@ class BoxConfig(models.Model):
     checkin_release_hour = models.PositiveIntegerField(default=18)
     coach_msg = models.CharField(max_length=150, blank=True, default="")
     pix_key = models.CharField(max_length=150, blank=True, default="")
+    invite_token = models.UUIDField(default=uuid.uuid4)
 
     class Meta:
         db_table = "box_config"

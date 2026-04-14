@@ -2,12 +2,17 @@ import { useState } from "react";
 import { useAuth } from "./hooks/useAuth.jsx";
 import LoginPage from "./pages/auth/LoginPage.jsx";
 import FirstAccessPage from "./pages/auth/FirstAccessPage.jsx";
+import CadastroPage from "./pages/auth/CadastroPage.jsx";
 import AlunoShell from "./pages/aluno/AlunoShell.jsx";
 import GestorShell from "./pages/gestor/GestorShell.jsx";
 import { InstallPrompt } from "./components/ui.jsx";
 
 export default function App() {
   const { user, loading } = useAuth();
+
+  // Public registration route — no auth required
+  const cadastroMatch = window.location.pathname.match(/^\/cadastro\/([^/]+)/);
+  if (cadastroMatch) return <CadastroPage token={cadastroMatch[1]} />;
 
   if (loading) return (
     <div style={{
