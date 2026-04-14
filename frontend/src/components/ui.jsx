@@ -340,3 +340,98 @@ export function Spinner() {
     </div>
   );
 }
+
+function shouldShowInstallPrompt() {
+  const isPWA = window.matchMedia("(display-mode: standalone)").matches
+             || navigator.standalone === true;
+  if (isPWA) return false;
+  const isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  if (!isIOS && !isAndroid) return false;
+  if (localStorage.getItem("mb_install_dismissed")) return false;
+  return true;
+}
+
+export function InstallPrompt() {
+  const [visible, setVisible] = useState(() => shouldShowInstallPrompt());
+  const [out, setOut]         = useState(false);
+
+  if (!visible) return null;
+
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  function dismiss() {
+    setOut(true);
+    setTimeout(() => {
+      localStorage.setItem("mb_install_dismissed", "1");
+      setVisible(false);
+    }, 280);
+  }
+
+  const steps = isIOS
+    ? [
+        { icon: "🧭", text: <>Abra esta página <strong>no Safari</strong> (obrigatório no iPhone/iPad)</> },
+        { icon: "⬆️", text: <>Toque no botão <strong>Compartilhar</strong> na barra inferior</> },
+        { icon: "➕", text: <>Selecione <strong>"Adicionar à Tela de Início"</strong></> },
+      ]
+    : [
+        { icon: "⋮",  text: <>Toque nos <strong>três pontos</strong> no canto superior do Chrome</> },
+        { icon: "➕", text: <>Selecione <strong>"Adicionar à tela inicial"</strong></> },
+      ];
+
+  return (
+    <>
+      <style>{`
+        @keyframes slideUp   { from { transform: translateY(100%) } to { transform: translateY(0) } }
+        @keyframes slideDown { from { transform: translateY(0) }     to { transform: translateY(100%) } }
+      `}</style>
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 500,
+        background: "rgba(0,0,0,0.6)", display: "flex",
+        alignItems: "flex-end", justifyContent: "center",
+      }}>
+        <div style={{
+          width: "100%", maxWidth: 430,
+          background: C.card, borderRadius: "22px 22px 0 0",
+          padding: "20px 20px calc(20px + env(safe-area-inset-bottom))",
+          boxSizing: "border-box",
+          animation: `${out ? "slideDown" : "slideUp"} 0.28s ease`,
+        }}>
+          {/* Handle */}
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: C.subtle, margin: "0 auto 20px" }} />
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <StarLogo size={28} glow />
+            <div>
+              <p style={{ margin: 0, color: C.text, fontWeight: 900, fontSize: 16 }}>Instale o app</p>
+              <p style={{ margin: 0, color: C.muted, fontSize: 12 }}>Acesse mais rápido direto da tela inicial</p>
+            </div>
+          </div>
+
+          {isIOS && (
+            <div style={{ background: C.warnDim, border: `1px solid ${C.warn}22`, borderRadius: 12, padding: "8px 12px", marginBottom: 14 }}>
+              <p style={{ margin: 0, color: C.warn, fontSize: 12 }}>
+                No iPhone/iPad, a instalação só funciona pelo <strong>Safari</strong>.
+              </p>
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+            {steps.map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 10, background: C.subtle,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 16, flexShrink: 0,
+                }}>{s.icon}</div>
+                <p style={{ margin: 0, color: C.text, fontSize: 13, lineHeight: 1.4 }}>{s.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <Btn full variant="ghost" onClick={dismiss}>Agora não</Btn>
+        </div>
+      </div>
+    </>
+  );
+}

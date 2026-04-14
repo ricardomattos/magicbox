@@ -4,6 +4,7 @@ import LoginPage from "./pages/auth/LoginPage.jsx";
 import FirstAccessPage from "./pages/auth/FirstAccessPage.jsx";
 import AlunoShell from "./pages/aluno/AlunoShell.jsx";
 import GestorShell from "./pages/gestor/GestorShell.jsx";
+import { InstallPrompt } from "./components/ui.jsx";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -25,5 +26,10 @@ export default function App() {
   if (!user) return <LoginPage />;
   if (user.must_change_pass && user.role === "aluno") return <FirstAccessPage />;
   if (user.role === "gestor") return <GestorShell />;
-  return <AlunoShell />;
+  return (
+    <>
+      <InstallPrompt />
+      <AlunoShell />
+    </>
+  );
 }
