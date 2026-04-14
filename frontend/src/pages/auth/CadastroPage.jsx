@@ -2,6 +2,19 @@ import { useState, useEffect } from "react";
 import { registerApi } from "../../api/index.js";
 import { Card, Btn, Input, StarLogo, C } from "../../components/ui.jsx";
 
+function maskBirthDate(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0,2)}/${digits.slice(2)}`;
+  return `${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4)}`;
+}
+
+function birthDateToISO(masked) {
+  const digits = masked.replace(/\D/g, "");
+  if (digits.length !== 8) return null;
+  return `${digits.slice(4,8)}-${digits.slice(2,4)}-${digits.slice(0,2)}`;
+}
+
 function maskPhone(value) {
   const digits = value.replace(/\D/g, "").slice(0, 11);
   if (digits.length <= 2)  return digits.replace(/^(\d{0,2})/, "($1");
@@ -51,7 +64,7 @@ function PlanPicker({ value, onChange, planos }) {
 export default function CadastroPage({ token }) {
   const [state, setState] = useState("loading"); // loading | invalid | form | success
   const [planos, setPlanos]   = useState([]);
-  const [form, setForm]       = useState({ name: "", email: "", password: "", phone: "", plano: "" });
+  const [form, setForm]       = useState({ name: "", email: "", password: "", phone: "", birth_date: "", plano: "" });
   const [err, setErr]         = useState("");
   const [saving, setSaving]   = useState(false);
   const setF = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -73,6 +86,7 @@ export default function CadastroPage({ token }) {
         email: form.email.trim(),
         password: form.password,
         phone: form.phone,
+        birth_date: birthDateToISO(form.birth_date),
         plano: form.plano ? parseInt(form.plano) : null,
       });
       setState("success");
@@ -137,6 +151,7 @@ export default function CadastroPage({ token }) {
             <Input label="E-mail" value={form.email} onChange={v => setF("email", v)} placeholder="email@exemplo.com" />
             <Input label="Senha" type="password" value={form.password} onChange={v => setF("password", v)} placeholder="Mínimo 6 caracteres" />
             <Input label="WhatsApp (opcional)" value={form.phone} onChange={v => setF("phone", maskPhone(v))} placeholder="(16) 99999-9999" />
+            <Input label="Data de nascimento (opcional)" value={form.birth_date} onChange={v => setF("birth_date", maskBirthDate(v))} placeholder="DD/MM/AAAA" />
 
             {planos.length > 0 && (
               <PlanPicker value={form.plano} onChange={v => setF("plano", v)} planos={planos} />

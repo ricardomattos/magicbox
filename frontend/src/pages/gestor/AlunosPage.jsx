@@ -121,6 +121,25 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
   );
 }
 
+function maskBirthDate(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0,2)}/${digits.slice(2)}`;
+  return `${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4)}`;
+}
+
+function birthDateToISO(masked) {
+  const digits = masked.replace(/\D/g, "");
+  if (digits.length !== 8) return null;
+  return `${digits.slice(4,8)}-${digits.slice(2,4)}-${digits.slice(0,2)}`;
+}
+
+function isoToBirthMask(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 function maskPhone(value) {
   const digits = value.replace(/\D/g, "").slice(0, 11);
   if (digits.length <= 2)  return digits.replace(/^(\d{0,2})/, "($1");
@@ -184,6 +203,7 @@ function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err,
       <Input label="Nome" value={form.name} onChange={v=>setF("name",v)} placeholder="Nome completo" />
       <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
       <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone", maskPhone(v))} placeholder="(16) 99999-9999" />
+      <Input label="Data de nascimento (opcional)" value={form.birth_date} onChange={v=>setF("birth_date", maskBirthDate(v))} placeholder="DD/MM/AAAA" />
       <Input label={editando ? "Nova senha (deixe em branco para manter)" : "Senha temporária"} type="password" value={form.password} onChange={v=>setF("password",v)} placeholder="Senha" hint={editando ? "" : "O aluno será solicitado a trocar no 1º acesso"} />
       <PlanoSelect value={form.plano} onChange={v=>setF("plano",v)} planos={planos} required={!editando} />
       {err && <p style={{ color: C.danger, fontSize: 13, margin: "-6px 0 10px" }}>{err}</p>}
@@ -211,12 +231,12 @@ export default function AlunosPage() {
   const [pagModal, setPagModal] = useState(null);
   const [resetConfirm, setResetConfirm] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [form, setForm] = useState({ name:"", email:"", phone:"", password:"", plano:"", must_change_pass:true });
+  const [form, setForm] = useState({ name:"", email:"", phone:"", birth_date:"", password:"", plano:"", must_change_pass:true });
   const [err, setErr] = useState("");
   const setF = (k,v) => setForm(p => ({...p,[k]:v}));
 
   async function abrirNovoAluno() {
-    setForm({ name:"", email:"", phone:"", password:"", plano:"", must_change_pass:true });
+    setForm({ name:"", email:"", phone:"", birth_date:"", password:"", plano:"", must_change_pass:true });
     setErr("");
     setInviteUrl("");
     setNovoAluno(true);
@@ -279,11 +299,11 @@ export default function AlunosPage() {
   });
   const inadCount = alunos.filter(u => isInadimplente(pagamentosMap[u.id] || [], u.since_key)).length;
 
-  function abrirEdicao(u) { setForm({ name:u.name, email:u.email, phone:u.phone||"", password:"", plano:u.plano||"", must_change_pass:u.must_change_pass||false }); setEditando(u.id); setErr(""); }
+  function abrirEdicao(u) { setForm({ name:u.name, email:u.email, phone:u.phone||"", birth_date:isoToBirthMask(u.birth_date), password:"", plano:u.plano||"", must_change_pass:u.must_change_pass||false }); setEditando(u.id); setErr(""); }
 
   async function salvarEdicao() {
     if (!form.name||!form.email) { setErr("Nome e e-mail são obrigatórios."); return; }
-    const payload = { name:form.name, email:form.email, phone:form.phone, plano:form.plano||null, must_change_pass:form.must_change_pass };
+    const payload = { name:form.name, email:form.email, phone:form.phone, birth_date:birthDateToISO(form.birth_date), plano:form.plano||null, must_change_pass:form.must_change_pass };
     if (form.password) payload.password = form.password;
     try { await usersApi.update(editando, payload); setEditando(null); loadAll(); }
     catch(e) { setErr(e.message); }
@@ -293,7 +313,7 @@ export default function AlunosPage() {
     if (!form.name||!form.email||!form.password) { setErr("Preencha nome, e-mail e senha."); return; }
     if (!form.plano) { setErr("Selecione um plano para o aluno."); return; }
     try {
-      await usersApi.create({ name:form.name, email:form.email, phone:form.phone, password:form.password, role:"aluno", plano:form.plano||null, must_change_pass:true });
+      await usersApi.create({ name:form.name, email:form.email, phone:form.phone, birth_date:birthDateToISO(form.birth_date), password:form.password, role:"aluno", plano:form.plano||null, must_change_pass:true });
       setNovoAluno(false); setForm({ name:"",email:"",phone:"",password:"",plano:"",must_change_pass:true }); setErr(""); loadAll();
     } catch(e) { setErr(e.message); }
   }
