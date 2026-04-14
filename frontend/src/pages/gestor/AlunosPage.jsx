@@ -62,32 +62,50 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
   }
 
   const mesAtualPago = pagamentos.includes(curMonthKey());
+  const prevKey = prevMonthKey();
+
+  // A month is "inadimplente" only if it's the previous month and unpaid
+  function mesStatus(m) {
+    if (m.pago) return { label: "Pago", bg: C.successDim, border: C.success, sub: null };
+    if (m.isCurrentMonth) return { label: "Em aberto", bg: C.blueDim, border: C.blue, sub: null };
+    if (m.isPast && m.key === prevKey) return { label: "Em atraso", bg: C.dangerDim, border: C.danger, sub: "Mês anterior não pago" };
+    if (m.isPast) return { label: "Em aberto", bg: C.subtle, border: C.border, sub: null };
+    return { label: "Em aberto", bg: C.subtle, border: C.border, sub: null };
+  }
 
   return (
     <Modal onClose={onClose} title={`Pagamentos — ${aluno.name}`}>
-      <div style={{ background: mesAtualPago ? C.successDim : C.dangerDim, borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ background: mesAtualPago ? C.successDim : C.blueDim, borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <p style={{ margin: 0, color: C.muted, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>Mês atual</p>
           <p style={{ margin: "2px 0 0", color: C.text, fontSize: 15, fontWeight: 700 }}>{MONTHS[CUR_M]} {CUR_Y}</p>
         </div>
-        {mesAtualPago ? <Badge label="✓ Pago" color={C.success} /> : <Btn small onClick={darBaixaAtual} disabled={acting}>Dar baixa</Btn>}
+        {mesAtualPago
+          ? <Btn small variant="ghost" onClick={() => toggle(curMonthKey())} disabled={acting}>✓ Pago — Desfazer</Btn>
+          : <Btn small onClick={darBaixaAtual} disabled={acting}>Dar baixa</Btn>}
       </div>
       {loading ? <Spinner /> : (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-          {meses.map(m => (
-            <button key={m.key} onClick={() => !acting && toggle(m.key)}
-              style={{ background: m.pago ? C.successDim : m.isPast||m.isCurrentMonth ? C.dangerDim : C.subtle, border: `1.5px solid ${m.pago ? C.success : m.isPast||m.isCurrentMonth ? C.danger : C.border}`, borderRadius: 14, padding: "12px 16px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", transition: "all 0.18s" }}>
-              <div style={{ textAlign: "left" }}>
-                <p style={{ margin: 0, color: C.text, fontSize: 14, fontWeight: m.isCurrentMonth ? 700 : 400 }}>
-                  {MONTHS[m.month]} {m.year}{m.isCurrentMonth ? " (atual)" : ""}
-                </p>
-                {m.isPast && !m.pago && <p style={{ margin: "2px 0 0", color: C.danger, fontSize: 11 }}>Em atraso</p>}
-              </div>
-              <div style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid ${m.pago ? C.success : C.muted}`, background: m.pago ? C.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {m.pago && <span style={{ color: "#fff", fontSize: 13 }}>✓</span>}
-              </div>
-            </button>
-          ))}
+          {meses.map(m => {
+            const s = mesStatus(m);
+            return (
+              <button key={m.key} onClick={() => !acting && toggle(m.key)}
+                style={{ background: s.bg, border: `1.5px solid ${s.border}`, borderRadius: 14, padding: "12px 16px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", transition: "all 0.18s" }}>
+                <div style={{ textAlign: "left" }}>
+                  <p style={{ margin: 0, color: C.text, fontSize: 14, fontWeight: m.isCurrentMonth ? 700 : 400 }}>
+                    {MONTHS[m.month]} {m.year}{m.isCurrentMonth ? " (atual)" : ""}
+                  </p>
+                  {s.sub && <p style={{ margin: "2px 0 0", color: C.danger, fontSize: 11 }}>{s.sub}</p>}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: m.pago ? C.success : m.key === prevKey && m.isPast ? C.danger : C.muted }}>{s.label}</span>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${m.pago ? C.success : C.border}`, background: m.pago ? C.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {m.pago && <span style={{ color: "#fff", fontSize: 11 }}>✓</span>}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
       <Btn full variant="subtle" onClick={onClose}>Fechar</Btn>
@@ -102,44 +120,22 @@ function maskPhone(value) {
   return digits.replace(/^(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
 }
 
-// ── Plan Picker ───────────────────────────────────────────────────────────────
-function PlanPicker({ value, onChange, planos }) {
-  const selected = String(value || "");
-  const options = [{ id: "", nome: "Sem plano", valor: null }, ...planos];
+// ── Plan Select (coach form) ──────────────────────────────────────────────────
+function PlanoSelect({ value, onChange, planos, required }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <p style={{ margin: "0 0 8px", color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
-        Plano
+      <p style={{ margin: "0 0 6px", color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        Plano{required && <span style={{ color: C.danger }}> *</span>}
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {options.map(p => {
-          const active = String(p.id) === selected;
-          return (
-            <button key={p.id} type="button" onClick={() => onChange(String(p.id))}
-              style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                width: "100%", padding: "11px 14px", borderRadius: 12, cursor: "pointer",
-                fontFamily: "inherit", fontSize: 14, textAlign: "left",
-                background: active ? C.blueDim : C.subtle,
-                border: `1.5px solid ${active ? C.blue : C.border}`,
-                color: active ? C.text : C.muted,
-                transition: "border-color 0.15s, background 0.15s",
-              }}>
-              <span style={{ fontWeight: active ? 600 : 400, color: p.id === "" ? C.muted : C.text }}>
-                {p.nome}
-              </span>
-              {p.valor != null && (
-                <span style={{ fontSize: 13, fontWeight: 700, color: active ? C.blue : C.muted }}>
-                  R$ {Number(p.valor).toFixed(2).replace(".", ",")}
-                </span>
-              )}
-              {active && (
-                <span style={{ marginLeft: 8, color: C.blue, fontSize: 16, lineHeight: 1 }}>✓</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <select value={String(value || "")} onChange={e => onChange(e.target.value)}
+        style={{ width: "100%", background: C.subtle, border: `1px solid ${!value && required ? C.danger : C.border}`, borderRadius: 12, padding: "12px 14px", color: value ? C.text : C.muted, fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }}>
+        <option value="">Selecione um plano...</option>
+        {planos.map(p => (
+          <option key={p.id} value={String(p.id)}>
+            {p.nome} — R$ {Number(p.valor).toFixed(2).replace(".", ",")}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -181,7 +177,7 @@ function AlunoForm({ title, onSave, onCancel, form, setF, editando, planos, err,
       <Input label="E-mail" value={form.email} onChange={v=>setF("email",v)} placeholder="email@exemplo.com" />
       <Input label="WhatsApp" value={form.phone} onChange={v=>setF("phone", maskPhone(v))} placeholder="(16) 99999-9999" />
       <Input label={editando ? "Nova senha (deixe em branco para manter)" : "Senha temporária"} type="password" value={form.password} onChange={v=>setF("password",v)} placeholder="Senha" hint={editando ? "" : "O aluno será solicitado a trocar no 1º acesso"} />
-      <PlanPicker value={form.plano} onChange={v=>setF("plano",v)} planos={planos} />
+      <PlanoSelect value={form.plano} onChange={v=>setF("plano",v)} planos={planos} required={!editando} />
       {err && <p style={{ color: C.danger, fontSize: 13, margin: "-6px 0 10px" }}>{err}</p>}
       <div style={{ display: "flex", gap: 10 }}>
         <Btn full variant="subtle" onClick={onCancel}>Cancelar</Btn>
@@ -272,6 +268,7 @@ export default function AlunosPage() {
 
   async function criarAluno() {
     if (!form.name||!form.email||!form.password) { setErr("Preencha nome, e-mail e senha."); return; }
+    if (!form.plano) { setErr("Selecione um plano para o aluno."); return; }
     try {
       await usersApi.create({ name:form.name, email:form.email, phone:form.phone, password:form.password, role:"aluno", plano:form.plano||null, must_change_pass:true });
       setNovoAluno(false); setForm({ name:"",email:"",phone:"",password:"",plano:"",must_change_pass:true }); setErr(""); loadAll();

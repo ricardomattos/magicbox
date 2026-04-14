@@ -87,7 +87,7 @@ export default function PlanoPage() {
               <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8 }}>Plano ativo</p>
               <h3 style={{ margin: "3px 0 0", color: "#fff", fontSize: 20, fontWeight: 900 }}>{user.plano_nome}</h3>
             </div>
-            <Badge label={mesAtualPago ? "Pago" : "Em aberto"} color={mesAtualPago ? C.success : C.danger} />
+            <Badge label={mesAtualPago ? "Pago" : "Em aberto"} color={mesAtualPago ? C.success : C.blue} />
           </div>
         </div>
       ) : (
@@ -113,9 +113,9 @@ export default function PlanoPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {meses.map(m => {
               const isFuture = !m.isPast && !m.isCurrentMonth;
-              const statusLabel = m.pago ? "Pago" : m.isPast ? "Atrasado" : m.isCurrentMonth ? "Em aberto" : "Em aberto";
-              const statusColor = m.pago ? C.success : m.isPast ? C.danger : m.isCurrentMonth ? C.warn : C.muted;
-              const dotColor    = m.pago ? C.success : m.isPast ? C.danger : m.isCurrentMonth ? C.warn : C.border;
+              const statusLabel = m.pago ? "Pago" : m.isPast ? "Em atraso" : "Em aberto";
+              const statusColor = m.pago ? C.success : m.isPast ? C.danger : m.isCurrentMonth ? C.blue : C.muted;
+              const dotColor    = m.pago ? C.success : m.isPast ? C.danger : m.isCurrentMonth ? C.blue : C.border;
               return (
                 <div key={m.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

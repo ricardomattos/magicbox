@@ -9,22 +9,21 @@ from apps.planos.models import Pagamento
 
 
 def pode_fazer_checkin(user):
-    """Block only truly delinquent students: registered before last month AND last month unpaid.
-    Students with current month 'em aberto' (not yet paid) can still check in."""
+    """Allow check-in if the student paid either the current or the previous month.
+    Blocks only if both months are unpaid (genuinely delinquent).
+    New students registered this month are always allowed."""
     from datetime import date
     today = date.today()
-    if today.month == 1:
-        prev_mes = f"{today.year - 1}-12"
-    else:
-        prev_mes = f"{today.year}-{str(today.month - 1).zfill(2)}"
+    cur_mes  = today.strftime("%Y-%m")
+    prev_mes = f"{today.year if today.month > 1 else today.year - 1}-{str(today.month - 1 if today.month > 1 else 12).zfill(2)}"
 
-    # Registered this month or after previous month → never delinquent yet
+    # Registered this month → no payment expected yet
     since_key = user.since.strftime("%Y-%m")
-    if since_key >= prev_mes:
+    if since_key >= cur_mes:
         return True
 
-    # Delinquent if previous month is unpaid
-    return Pagamento.objects.filter(aluno=user, mes=prev_mes).exists()
+    # OK if paid at least one of: current month or previous month
+    return Pagamento.objects.filter(aluno=user, mes__in=[cur_mes, prev_mes]).exists()
 
 
 # ── Templates ──────────────────────────────────────────────────────────────────
