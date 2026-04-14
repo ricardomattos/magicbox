@@ -31,6 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name="alunos"
     )
     must_change_pass = models.BooleanField(default=True)
+    birth_date = models.DateField(null=True, blank=True)
     since = models.DateField(auto_now_add=True)       # registration date
 
     is_active = models.BooleanField(default=True)

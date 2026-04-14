@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "id", "email", "name", "phone", "role",
+            "id", "email", "name", "phone", "birth_date", "role",
             "plano", "plano_nome", "plano_cor",
             "must_change_pass", "since", "since_key",
             "treinos_total", "treinos_mes",
@@ -30,7 +30,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "name", "phone", "role", "plano", "password", "must_change_pass"]
+        fields = ["id", "email", "name", "phone", "birth_date", "role", "plano", "password", "must_change_pass"]
 
     def create(self, validated_data):
         password = validated_data.pop("password")
@@ -63,10 +63,11 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class PublicRegisterSerializer(serializers.Serializer):
-    name     = serializers.CharField(max_length=150)
-    email    = serializers.EmailField()
-    password = serializers.CharField(min_length=6)
-    phone    = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    name       = serializers.CharField(max_length=150)
+    email      = serializers.EmailField()
+    password   = serializers.CharField(min_length=6)
+    phone      = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    birth_date = serializers.DateField(required=False, allow_null=True)
     plano    = serializers.IntegerField(required=False, allow_null=True)
 
     def validate_email(self, value):
@@ -77,6 +78,7 @@ class PublicRegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         plano_id = validated_data.pop("plano", None)
         password = validated_data.pop("password")
+        validated_data.setdefault("birth_date", None)
         user = User(role="aluno", must_change_pass=False, **validated_data)
         if plano_id:
             user.plano_id = plano_id
