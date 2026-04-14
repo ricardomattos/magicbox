@@ -139,7 +139,7 @@ export function Select({ label, value, onChange, children, style: s = {} }) {
   );
 }
 
-export function Modal({ children, onClose, title }) {
+export function Modal({ children, onClose, title, contentStyle }) {
   const mobile = useIsMobile();
   return (
     <div
@@ -157,6 +157,7 @@ export function Modal({ children, onClose, title }) {
         width: "100%",
         maxWidth: mobile ? 430 : 520,
         maxHeight: "90vh", overflowY: "auto",
+        ...contentStyle,
       }}>
         {title && <h3 style={{ margin: "0 0 18px", color: C.text, fontSize: 17, fontWeight: 800 }}>{title}</h3>}
         {children}

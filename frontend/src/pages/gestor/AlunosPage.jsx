@@ -74,8 +74,10 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
   }
 
   return (
-    <Modal onClose={onClose} title={`Pagamentos — ${aluno.name}`}>
-      <div style={{ background: mesAtualPago ? C.successDim : C.blueDim, borderRadius: 14, padding: "14px 16px", marginBottom: 18, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <Modal onClose={onClose} title={`Pagamentos — ${aluno.name}`}
+      contentStyle={{ maxHeight: "70vh", overflowY: "hidden", display: "flex", flexDirection: "column" }}>
+      {/* Mês atual — fixo no topo */}
+      <div style={{ background: mesAtualPago ? C.successDim : C.blueDim, borderRadius: 14, padding: "14px 16px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div>
           <p style={{ margin: 0, color: C.muted, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>Mês atual</p>
           <p style={{ margin: "2px 0 0", color: C.text, fontSize: 15, fontWeight: 700 }}>{MONTHS[CUR_M]} {CUR_Y}</p>
@@ -84,13 +86,15 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
           ? <Btn small variant="ghost" onClick={() => toggle(curMonthKey())} disabled={acting}>✓ Pago — Desfazer</Btn>
           : <Btn small onClick={darBaixaAtual} disabled={acting}>Dar baixa</Btn>}
       </div>
+
+      {/* Lista de meses — rolável */}
       {loading ? <Spinner /> : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingRight: 2 }}>
           {meses.map(m => {
             const s = mesStatus(m);
             return (
               <button key={m.key} onClick={() => !acting && toggle(m.key)}
-                style={{ background: s.bg, border: `1.5px solid ${s.border}`, borderRadius: 14, padding: "12px 16px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", transition: "all 0.18s" }}>
+                style={{ background: s.bg, border: `1.5px solid ${s.border}`, borderRadius: 14, padding: "12px 16px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", transition: "all 0.18s", flexShrink: 0 }}>
                 <div style={{ textAlign: "left" }}>
                   <p style={{ margin: 0, color: C.text, fontSize: 14, fontWeight: m.isCurrentMonth ? 700 : 400 }}>
                     {MONTHS[m.month]} {m.year}{m.isCurrentMonth ? " (atual)" : ""}
@@ -108,7 +112,11 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
           })}
         </div>
       )}
-      <Btn full variant="subtle" onClick={onClose}>Fechar</Btn>
+
+      {/* Fechar — fixo no rodapé */}
+      <div style={{ flexShrink: 0 }}>
+        <Btn full variant="subtle" onClick={onClose}>Fechar</Btn>
+      </div>
     </Modal>
   );
 }
