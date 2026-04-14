@@ -30,7 +30,12 @@ export default function App() {
 
   if (!user) return <LoginPage />;
   if (user.must_change_pass && user.role === "aluno") return <FirstAccessPage />;
-  if (user.role === "gestor") return <GestorShell />;
+  if (user.role === "gestor") return (
+    <>
+      <InstallPrompt />
+      <GestorShell />
+    </>
+  );
   return (
     <>
       <InstallPrompt />

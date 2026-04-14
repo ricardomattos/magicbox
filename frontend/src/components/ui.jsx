@@ -354,6 +354,13 @@ export function InstallPrompt() {
   const [visible, setVisible] = useState(() => shouldShowInstallPrompt());
   const [out, setOut]         = useState(false);
 
+  useEffect(() => {
+    if (!visible) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [visible]);
+
   if (!visible) return null;
 
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -381,7 +388,7 @@ export function InstallPrompt() {
         @keyframes slideDown { from { transform: translateY(0) }     to { transform: translateY(100%) } }
       `}</style>
       <div style={{
-        position: "fixed", inset: 0, zIndex: 500,
+        position: "fixed", inset: 0, zIndex: 500, overflow: "hidden",
         background: "rgba(0,0,0,0.6)", display: "flex",
         alignItems: "flex-end", justifyContent: "center",
       }}>
