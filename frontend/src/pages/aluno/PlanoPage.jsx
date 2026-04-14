@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
-import { planosApi } from "../../api/index.js";
+import { planosApi, configApi } from "../../api/index.js";
 import { Card, Badge, Avatar, Spinner, C, useIsMobile } from "../../components/ui.jsx";
 
 const MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -41,15 +41,24 @@ export default function PlanoPage() {
   const { user } = useAuth();
   const mobile = useIsMobile();
   const [pagamentos, setPagamentos] = useState([]);
+  const [pixKey, setPixKey] = useState("");
+  const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    planosApi.getPagamentos(user.id)
-      .then(d => setPagamentos(d.meses_pagos || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      planosApi.getPagamentos(user.id).then(d => setPagamentos(d.meses_pagos || [])),
+      configApi.get().then(c => setPixKey(c.pix_key || "")).catch(() => {}),
+    ]).finally(() => setLoading(false));
   }, [user]);
+
+  function copiarPix() {
+    navigator.clipboard.writeText(pixKey).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   const mesAtualPago = pagamentos.includes(curMonthKey());
   const sinceKey = user?.since_key;
@@ -90,6 +99,17 @@ export default function PlanoPage() {
       {loading ? <Spinner /> : (
         <Card style={{ marginBottom: 14 }}>
           <p style={{ margin: "0 0 14px", color: C.text, fontWeight: 700, fontSize: 14 }}>Situação de pagamentos</p>
+          {pixKey ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: C.subtle, borderRadius: 10, padding: "8px 12px", marginBottom: 14, gap: 8 }}>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, color: C.muted, fontSize: 11 }}>Chave PIX para pagamento</p>
+                <p style={{ margin: "2px 0 0", color: C.text, fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pixKey}</p>
+              </div>
+              <button onClick={copiarPix} style={{ flexShrink: 0, background: copied ? C.success : C.blueDim, color: copied ? "#fff" : C.blue, border: "none", borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+                {copied ? "Copiado!" : "Copiar"}
+              </button>
+            </div>
+          ) : null}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {meses.map(m => {
               const isFuture = !m.isPast && !m.isCurrentMonth;

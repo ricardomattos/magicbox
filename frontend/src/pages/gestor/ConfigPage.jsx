@@ -7,19 +7,20 @@ export default function ConfigPage() {
   const [config, setConfig] = useState(null);
   const [hour, setHour]     = useState(18);
   const [msg, setMsg]       = useState("");
+  const [pix, setPix]       = useState("");
   const [saved, setSaved]   = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     configApi.get()
-      .then(c => { setConfig(c); setHour(c.checkin_release_hour ?? 18); setMsg(c.coach_msg || ""); })
+      .then(c => { setConfig(c); setHour(c.checkin_release_hour ?? 18); setMsg(c.coach_msg || ""); setPix(c.pix_key || ""); })
       .finally(() => setLoading(false));
   }, []);
 
   async function salvar() {
     if (msg.length > 150) return;
     try {
-      await configApi.update({ checkin_release_hour: parseInt(hour), coach_msg: msg.trim() });
+      await configApi.update({ checkin_release_hour: parseInt(hour), coach_msg: msg.trim(), pix_key: pix.trim() });
       setSaved(true); setTimeout(() => setSaved(false), 2000);
     } catch(e) { alert(e.message); }
   }
@@ -58,6 +59,16 @@ export default function ConfigPage() {
           placeholder="Ex: Treino pesado essa semana! Bora superar os limites 💪" rows={3}
           style={{ width: "100%", background: C.subtle, border: `1px solid ${msg.length > 140 ? C.warn : C.border}`, borderRadius: 12, padding: "12px 14px", color: C.text, fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", lineHeight: 1.5 }} />
         <p style={{ margin: "4px 0 0", color: msg.length > 140 ? C.warn : C.muted, fontSize: 11, textAlign: "right" }}>{msg.length}/150</p>
+      </Card>
+
+      <Card style={{ marginBottom: 14 }}>
+        <p style={{ margin: "0 0 4px", color: C.text, fontWeight: 700, fontSize: 15 }}>💸 Chave PIX</p>
+        <p style={{ margin: "0 0 12px", color: C.muted, fontSize: 13 }}>
+          Exibida para os alunos na tela "Meu Plano" para facilitar o pagamento.
+        </p>
+        <input value={pix} onChange={e => setPix(e.target.value.slice(0,150))}
+          placeholder="Ex: 11999999999 ou email@exemplo.com"
+          style={{ width: "100%", background: C.subtle, border: `1px solid ${C.border}`, borderRadius: 12, padding: "12px 14px", color: C.text, fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
       </Card>
 
       <Btn full onClick={salvar} variant={saved ? "success" : "primary"}>

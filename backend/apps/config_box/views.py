@@ -9,7 +9,7 @@ from apps.users.views import IsGestor
 class BoxConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoxConfig
-        fields = ["checkin_release_hour", "coach_msg"]
+        fields = ["checkin_release_hour", "coach_msg", "pix_key"]
 
 
 class BoxConfigView(APIView):

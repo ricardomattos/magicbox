@@ -5,6 +5,7 @@ class BoxConfig(models.Model):
     """Singleton config for the box. Only one row exists."""
     checkin_release_hour = models.PositiveIntegerField(default=18)
     coach_msg = models.CharField(max_length=150, blank=True, default="")
+    pix_key = models.CharField(max_length=150, blank=True, default="")
 
     class Meta:
         db_table = "box_config"
