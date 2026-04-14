@@ -235,10 +235,24 @@ export default function AlunosPage() {
   }
 
   function copiarLink() {
-    navigator.clipboard.writeText(inviteUrl).then(() => {
-      setInviteCopied(true);
-      setTimeout(() => setInviteCopied(false), 2000);
-    });
+    const done = () => { setInviteCopied(true); setTimeout(() => setInviteCopied(false), 2000); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(inviteUrl).then(done).catch(() => fallbackCopy(inviteUrl, done));
+    } else {
+      fallbackCopy(inviteUrl, done);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); cb(); } catch {}
+    document.body.removeChild(ta);
   }
 
   const loadAll = useCallback(async () => {

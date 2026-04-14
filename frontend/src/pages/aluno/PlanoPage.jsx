@@ -54,10 +54,24 @@ export default function PlanoPage() {
   }, [user]);
 
   function copiarPix() {
-    navigator.clipboard.writeText(pixKey).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    const done = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(pixKey).then(done).catch(() => fallbackCopy(pixKey, done));
+    } else {
+      fallbackCopy(pixKey, done);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); cb(); } catch {}
+    document.body.removeChild(ta);
   }
 
   const mesAtualPago = pagamentos.includes(curMonthKey());
