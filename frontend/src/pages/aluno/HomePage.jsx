@@ -58,7 +58,7 @@ export default function HomePage({ setTab }) {
               <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8 }}>Plano ativo</p>
               <h3 style={{ margin: "3px 0 0", color: "#fff", fontSize: 18, fontWeight: 900 }}>{planoNome}</h3>
             </div>
-            <Badge label={mesAtualPago ? "Pago" : "Em aberto"} color={mesAtualPago ? C.success : C.danger} />
+            <Badge label={mesAtualPago ? "Pago" : "Em aberto"} color={mesAtualPago ? C.success : C.blue} />
           </div>
           <div style={{ marginTop: 14 }}>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 11 }}>{MONTHS[curMonth]} {curYear}</p>
