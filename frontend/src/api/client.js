@@ -80,7 +80,11 @@ async function request(path, options = {}) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw Object.assign(new Error(err.detail || "Request failed"), { data: err, status: res.status });
+    // DRF field errors come as { field: ["msg"] } — extract first message as fallback
+    const fieldMsg = !err.detail
+      ? Object.values(err).flat().find(v => typeof v === "string")
+      : null;
+    throw Object.assign(new Error(err.detail || fieldMsg || "Erro inesperado."), { data: err, status: res.status });
   }
 
   if (res.status === 204) return null;
