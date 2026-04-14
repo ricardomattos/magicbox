@@ -8,11 +8,23 @@ from apps.users.views import IsGestor
 from apps.planos.models import Pagamento
 
 
-def mes_atual_pago(user):
-    """Check if current month is paid for a student."""
+def pode_fazer_checkin(user):
+    """Block only truly delinquent students: registered before last month AND last month unpaid.
+    Students with current month 'em aberto' (not yet paid) can still check in."""
     from datetime import date
-    mes = date.today().strftime("%Y-%m")
-    return Pagamento.objects.filter(aluno=user, mes=mes).exists()
+    today = date.today()
+    if today.month == 1:
+        prev_mes = f"{today.year - 1}-12"
+    else:
+        prev_mes = f"{today.year}-{str(today.month - 1).zfill(2)}"
+
+    # Registered this month or after previous month → never delinquent yet
+    since_key = user.since.strftime("%Y-%m")
+    if since_key >= prev_mes:
+        return True
+
+    # Delinquent if previous month is unpaid
+    return Pagamento.objects.filter(aluno=user, mes=prev_mes).exists()
 
 
 # ── Templates ──────────────────────────────────────────────────────────────────
@@ -113,9 +125,9 @@ class CheckinView(APIView):
         if request.user.role != "aluno":
             return Response({"detail": "Apenas alunos podem fazer check-in."}, status=403)
 
-        if not mes_atual_pago(request.user):
+        if not pode_fazer_checkin(request.user):
             return Response(
-                {"detail": "Mensalidade em aberto. Regularize para fazer check-in."},
+                {"detail": "Mensalidade em atraso. Regularize para fazer check-in."},
                 status=403
             )
 

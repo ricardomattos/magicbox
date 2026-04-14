@@ -347,9 +347,7 @@ function shouldShowInstallPrompt() {
   if (isPWA) return false;
   const isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
-  if (!isIOS && !isAndroid) return false;
-  if (localStorage.getItem("mb_install_dismissed")) return false;
-  return true;
+  return isIOS || isAndroid;
 }
 
 export function InstallPrompt() {
@@ -362,10 +360,7 @@ export function InstallPrompt() {
 
   function dismiss() {
     setOut(true);
-    setTimeout(() => {
-      localStorage.setItem("mb_install_dismissed", "1");
-      setVisible(false);
-    }, 280);
+    setTimeout(() => setVisible(false), 280);
   }
 
   const steps = isIOS
