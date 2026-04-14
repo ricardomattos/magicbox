@@ -6,6 +6,7 @@ import { Card, Badge, Btn, Spinner, StarLogo, C, useIsMobile } from "../../compo
 function todayStr()    { return new Date().toISOString().split("T")[0]; }
 function tomorrowStr() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split("T")[0]; }
 function curMonthKey() { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`; }
+function prevMonthKey() { const n = new Date(); let m = n.getMonth()-1, y = n.getFullYear(); if(m<0){m=11;y--;} return `${y}-${String(m+1).padStart(2,"0")}`; }
 
 export default function CheckinPage() {
   const { user, refreshUser } = useAuth();
@@ -16,17 +17,27 @@ export default function CheckinPage() {
   const [loading, setLoading] = useState(true);
   const [sel, setSel]         = useState(null);
   const [acting, setActing]   = useState(false);
-  const [mesAtualPago, setMesAtualPago] = useState(null); // null = ainda carregando
+  const [podeCheckin, setPodeCheckin] = useState(null); // null = carregando
 
   const hora = new Date().getHours();
 
   useEffect(() => {
     configApi.get().then(setConfig).catch(() => {});
     if (user) {
-      setMesAtualPago(null); // reseta ao re-executar (ex: refresh do user)
+      setPodeCheckin(null);
       planosApi.getPagamentos(user.id)
-        .then(d => setMesAtualPago((d.meses_pagos || []).includes(curMonthKey())))
-        .catch(() => setMesAtualPago(false));
+        .then(d => {
+          const pagos = d.meses_pagos || [];
+          // Espelha a lógica do backend:
+          // - cadastrado este mês → sempre liberado
+          // - pagou o mês atual OU o mês anterior → liberado
+          const registradoEsteMes = (user.since_key || "") >= curMonthKey();
+          const ok = registradoEsteMes
+            || pagos.includes(curMonthKey())
+            || pagos.includes(prevMonthKey());
+          setPodeCheckin(ok);
+        })
+        .catch(() => setPodeCheckin(false));
     }
   }, [user]);
 
@@ -76,7 +87,7 @@ export default function CheckinPage() {
   }
 
   // Show spinner while payment status or horarios are still loading
-  if (mesAtualPago === null || loading) return (
+  if (podeCheckin === null || loading) return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
       <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Check-in</h2>
@@ -85,8 +96,8 @@ export default function CheckinPage() {
     </div>
   );
 
-  // Blocked: payment overdue
-  if (!mesAtualPago && !meuCheckin) return (
+  // Blocked: genuinely delinquent (neither current nor previous month paid)
+  if (!podeCheckin && !meuCheckin) return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
       <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 20px" : "28px 0 20px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Check-in</h2>
