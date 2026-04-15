@@ -12,7 +12,7 @@ export default function App() {
   const { user, loading } = useAuth();
 
   // Public landing page — no auth required
-  if (window.location.pathname === "/teste") return <LandingPage />;
+  if (window.location.pathname === "/index") return <LandingPage />;
 
   // Public registration route — no auth required
   const cadastroMatch = window.location.pathname.match(/^\/cadastro\/([^/]+)/);
