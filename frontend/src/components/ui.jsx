@@ -224,6 +224,7 @@ export function BottomNav({ tab, setTab, isGestor, user, onLogout }) {
   const [confirm, setConfirm] = useState(false);
   const items = isGestor
     ? [
+        { id: "g_dash",     label: "Dash",     icon: "📊" },
         { id: "g_horarios", label: "Horários", icon: "📅" },
         { id: "g_alunos",   label: "Alunos",   icon: "👥" },
         { id: "g_planos",   label: "Planos",   icon: "📋" },

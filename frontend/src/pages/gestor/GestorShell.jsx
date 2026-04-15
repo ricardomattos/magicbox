@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { TopBar, BottomNav, C, useIsMobile } from "../../components/ui.jsx";
+import DashPage from "./DashPage.jsx";
 import HorariosPage from "./HorariosPage.jsx";
 import AlunosPage from "./AlunosPage.jsx";
 import PlanosPage from "./PlanosPage.jsx";
@@ -8,7 +9,7 @@ import ConfigPage from "./ConfigPage.jsx";
 
 export default function GestorShell() {
   const { user, logout } = useAuth();
-  const [tab, setTab] = useState("g_horarios");
+  const [tab, setTab] = useState("g_dash");
   const mobile = useIsMobile();
 
   return (
@@ -26,6 +27,7 @@ export default function GestorShell() {
         position: "relative",
       }}>
         <TopBar user={user} onLogout={logout} />
+        {tab === "g_dash"     && <DashPage />}
         {tab === "g_horarios" && <HorariosPage />}
         {tab === "g_alunos"   && <AlunosPage />}
         {tab === "g_planos"   && <PlanosPage />}

@@ -6,9 +6,13 @@ import CadastroPage from "./pages/auth/CadastroPage.jsx";
 import AlunoShell from "./pages/aluno/AlunoShell.jsx";
 import GestorShell from "./pages/gestor/GestorShell.jsx";
 import { InstallPrompt } from "./components/ui.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
 export default function App() {
   const { user, loading } = useAuth();
+
+  // Public landing page — no auth required
+  if (window.location.pathname === "/teste") return <LandingPage />;
 
   // Public registration route — no auth required
   const cadastroMatch = window.location.pathname.match(/^\/cadastro\/([^/]+)/);
