@@ -15,6 +15,18 @@ const C = {
   white: "#ffffff",
 };
 
+// ── Hook: mobile breakpoint ─────────────────────────────────────────────────
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < breakpoint);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 // ── Hook: scroll reveal ──────────────────────────────────────────────────────
 function useReveal(threshold = 0.15) {
   const ref = useRef(null);
@@ -327,12 +339,15 @@ function Stats() {
 
 // ── About ────────────────────────────────────────────────────────────────────
 function About() {
+  const isMobile = useIsMobile();
   return (
     <section style={{ background: C.bg, padding: "100px 24px" }}>
       <div style={{
         maxWidth: 1100, margin: "0 auto",
-        display: "grid", gridTemplateColumns: "1fr 1fr",
-        gap: 80, alignItems: "center",
+        display: "grid",
+        gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+        gap: isMobile ? 40 : 80,
+        alignItems: "center",
       }}>
         {/* Image side */}
         <Reveal direction="left">
@@ -712,6 +727,7 @@ function CTABanner() {
 
 // ── Localização ───────────────────────────────────────────────────────────────
 function Localizacao() {
+  const isMobile = useIsMobile();
   return (
     <section id="localizacao" style={{ background: C.card, padding: "100px 24px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -732,8 +748,10 @@ function Localizacao() {
         </Reveal>
 
         <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr",
-          gap: 40, alignItems: "start",
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          gap: isMobile ? 32 : 40,
+          alignItems: "start",
         }}>
           {/* Map */}
           <Reveal direction="left">
