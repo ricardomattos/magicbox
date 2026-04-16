@@ -155,13 +155,13 @@ class CheckinView(APIView):
 
         existing = Checkin.objects.filter(
             aluno=request.user,
-            horario__data__in=[today, tomorrow],
+            horario__data=horario.data,
             horario__modalidade=horario.modalidade,
             ativo=True
         ).first()
         if existing:
             return Response(
-                {"detail": "Você já tem um check-in ativo nesta modalidade. Libere-o antes de reservar outro."},
+                {"detail": "Você já tem um check-in ativo neste dia e modalidade. Libere-o antes de reservar outro."},
                 status=400
             )
 
