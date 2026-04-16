@@ -7,12 +7,14 @@ class UserSerializer(serializers.ModelSerializer):
     since_key = serializers.ReadOnlyField()
     plano_nome = serializers.SerializerMethodField()
     plano_cor = serializers.SerializerMethodField()
+    plano_tem_crossfit = serializers.SerializerMethodField()
+    plano_tem_hyrox = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             "id", "email", "name", "phone", "birth_date", "role",
-            "plano", "plano_nome", "plano_cor",
+            "plano", "plano_nome", "plano_cor", "plano_tem_crossfit", "plano_tem_hyrox",
             "must_change_pass", "since", "since_key",
             "treinos_total", "treinos_mes",
         ]
@@ -23,6 +25,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_plano_cor(self, obj):
         return obj.plano.cor if obj.plano else None
+
+    def get_plano_tem_crossfit(self, obj):
+        return obj.plano.tem_crossfit if obj.plano else False
+
+    def get_plano_tem_hyrox(self, obj):
+        return obj.plano.tem_hyrox if obj.plano else False
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

@@ -99,7 +99,21 @@ export default function PlanoPage() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8 }}>Plano ativo</p>
-              <h3 style={{ margin: "3px 0 0", color: "#fff", fontSize: 20, fontWeight: 900 }}>{user.plano_nome}</h3>
+              <h3 style={{ margin: "3px 0 6px", color: "#fff", fontSize: 20, fontWeight: 900 }}>{user.plano_nome}</h3>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {user.plano_tem_crossfit && (
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 20,
+                    background: "rgba(41,121,255,0.30)", color: "#a8c4ff", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Crossfit
+                  </span>
+                )}
+                {user.plano_tem_hyrox && (
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 20,
+                    background: "rgba(255,179,0,0.30)", color: "#ffe082", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Hyrox
+                  </span>
+                )}
+              </div>
             </div>
             <Badge label={mesAtualPago ? "Pago" : "Em aberto"} color={mesAtualPago ? C.success : C.blue} />
           </div>
