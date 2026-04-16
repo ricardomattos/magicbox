@@ -6,7 +6,7 @@ from apps.users.serializers import UserSerializer
 class HorarioTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = HorarioTemplate
-        fields = ["id", "dia_semana", "hora", "vagas", "ativo"]
+        fields = ["id", "dia_semana", "hora", "vagas", "ativo", "modalidade"]
 
 
 class CheckinSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class HorarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Horario
         fields = [
-            "id", "data", "hora", "vagas",
+            "id", "data", "hora", "vagas", "modalidade",
             "confirmados_count", "vagas_livres",
             "confirmados", "meu_checkin_id",
         ]

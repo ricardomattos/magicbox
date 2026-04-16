@@ -8,7 +8,11 @@ function getTodayPY() { return [6,0,1,2,3,4,5][new Date().getDay()]; }
 const HORAS = Array.from({length:41},(_,i)=>{const h=Math.floor(i/2)+5,m=i%2===0?"00":"30";return `${String(h).padStart(2,"0")}:${m}`;});
 
 function todayStr() { return new Date().toISOString().split("T")[0]; }
-function addDays(n) { const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().split("T")[0]; }
+
+const MODALIDADES = [
+  { key: "crossfit", label: "Crossfit", color: C.blue },
+  { key: "hyrox",   label: "Hyrox",    color: C.warn },
+];
 
 // ── Checkin detail modal ──────────────────────────────────────────────────────
 function CheckinDetailModal({ horario, onClose, onSaveVagas }) {
@@ -85,6 +89,7 @@ function CheckinDetailModal({ horario, onClose, onSaveVagas }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function HorariosPage() {
   const mobile = useIsMobile();
+  const [modalidade, setModalidade] = useState("crossfit");
   const [diaAtivo, setDiaAtivo] = useState(getTodayPY);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,25 +98,21 @@ export default function HorariosPage() {
   const [checkinModal, setCheckinModal] = useState(null);
   const [confirm, setConfirm] = useState(null);
   const [adding, setAdding] = useState(false);
-
-  // For concrete slots we show today's date; for templates we manage by weekday
-  // This page manages HorarioTemplate (weekday schedule) for the gestor
   const [templates, setTemplates] = useState([]);
 
   const loadTemplates = useCallback(() => {
     setLoading(true);
-    horariosApi.templates.list()
+    horariosApi.templates.list(modalidade)
       .then(data => setTemplates(data))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [modalidade]);
 
-  // Also load today's concrete slots (to show check-ins)
   const loadHorarios = useCallback(() => {
-    horariosApi.list(todayStr())
+    horariosApi.list(todayStr(), modalidade)
       .then(setHorarios)
       .catch(() => {});
-  }, []);
+  }, [modalidade]);
 
   useEffect(() => { loadTemplates(); loadHorarios(); }, [loadTemplates, loadHorarios]);
 
@@ -121,8 +122,7 @@ export default function HorariosPage() {
   async function addTemplate() {
     setAdding(true);
     try {
-      const [h, m] = novaHora.split(":");
-      await horariosApi.templates.create({ dia_semana: diaAtivo, hora: `${novaHora}:00`, vagas: parseInt(novaVaga) || 12 });
+      await horariosApi.templates.create({ dia_semana: diaAtivo, hora: `${novaHora}:00`, vagas: parseInt(novaVaga) || 12, modalidade });
       loadTemplates();
     } catch (e) { alert(e.message); }
     finally { setAdding(false); }
@@ -136,7 +136,7 @@ export default function HorariosPage() {
 
   async function replicar() {
     try {
-      await horariosApi.templates.replicate(diaAtivo);
+      await horariosApi.templates.replicate(diaAtivo, modalidade);
       loadTemplates();
     } catch (e) { alert(e.message); }
     setConfirm(null);
@@ -147,16 +147,32 @@ export default function HorariosPage() {
     loadTemplates();
   }
 
-  // Today's concrete horario matching a template (for check-in modal)
   function getConcreteHorario(hora) {
     return horarios.find(h => h.hora.slice(0,5) === hora.slice(0,5));
   }
 
+  const modAtiva = MODALIDADES.find(m => m.key === modalidade);
+
   return (
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
-      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 22px" : "28px 0 22px" }}>
+      <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 16px" : "28px 0 16px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Horários</h2>
-        <p style={{ margin: "3px 0 0", color: C.muted, fontSize: 12 }}>Grade semanal de aulas</p>
+        <p style={{ margin: "3px 0 12px", color: C.muted, fontSize: 12 }}>Grade semanal de aulas</p>
+
+        {/* Modalidade tabs */}
+        <div style={{ display: "flex", gap: 8 }}>
+          {MODALIDADES.map(m => (
+            <button key={m.key} onClick={() => setModalidade(m.key)}
+              style={{
+                padding: "8px 20px", borderRadius: 12, border: "none", cursor: "pointer",
+                fontFamily: "inherit", fontWeight: 700, fontSize: 13, transition: "all 0.15s",
+                background: modalidade === m.key ? m.color : C.subtle,
+                color: modalidade === m.key ? "#fff" : C.muted,
+              }}>
+              {m.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Day selector */}
@@ -165,10 +181,10 @@ export default function HorariosPage() {
           const count = templatesDayCount(d);
           return (
             <button key={d} onClick={() => setDiaAtivo(d)}
-              style={{ flexShrink: 0, padding: "8px 14px", borderRadius: 12, background: diaAtivo === d ? C.blue : C.subtle, color: diaAtivo === d ? "#fff" : C.muted, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700, fontSize: 12, position: "relative" }}>
+              style={{ flexShrink: 0, padding: "8px 14px", borderRadius: 12, background: diaAtivo === d ? modAtiva.color : C.subtle, color: diaAtivo === d ? "#fff" : C.muted, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700, fontSize: 12, position: "relative" }}>
               {["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"][d]}
               {count > 0 && (
-                <span style={{ position: "absolute", top: -4, right: -4, background: diaAtivo === d ? C.success : C.blue, color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}>{count}</span>
+                <span style={{ position: "absolute", top: -4, right: -4, background: diaAtivo === d ? C.success : modAtiva.color, color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: 9, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}>{count}</span>
               )}
             </button>
           );
@@ -193,7 +209,7 @@ export default function HorariosPage() {
             <input type="number" min="1" max="100" value={novaVaga} onChange={e => setNovaVaga(e.target.value)}
               style={{ width: "100%", background: C.subtle, border: `1px solid ${C.border}`, borderRadius: 12, padding: "10px 12px", color: C.text, fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
           </div>
-          <Btn onClick={addTemplate} disabled={adding} style={{ flexShrink: 0 }}>Add</Btn>
+          <Btn onClick={addTemplate} disabled={adding} style={{ flexShrink: 0, background: modAtiva.color }}>Add</Btn>
         </div>
       </Card>
 
@@ -207,7 +223,7 @@ export default function HorariosPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {templatesDia.length === 0 && (
             <p style={{ color: C.muted, textAlign: "center", fontSize: 14 }}>
-              Nenhum horário para {["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"][diaAtivo]}.
+              Nenhum horário de {modAtiva.label} para {["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"][diaAtivo]}.
             </p>
           )}
           {templatesDia.map(t => {
@@ -223,14 +239,14 @@ export default function HorariosPage() {
                     <span style={{ color: C.muted, fontSize: 12 }}>{count}/{t.vagas} alunos</span>
                   </div>
                   <div style={{ background: C.subtle, borderRadius: 4, height: 6 }}>
-                    <div style={{ width: `${pct}%`, height: "100%", borderRadius: 4, background: pct >= 100 ? C.danger : C.blue }} />
+                    <div style={{ width: `${pct}%`, height: "100%", borderRadius: 4, background: pct >= 100 ? C.danger : modAtiva.color }} />
                   </div>
                   {concrete && count > 0 ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 10 }}>
                       {(concrete.confirmados || []).slice(0, 6).map((c, i) => (
                         <Avatar key={i} name={c.aluno_nome} size={24} style={{ marginLeft: i > 0 ? -6 : 0, border: `2px solid ${C.card}` }} />
                       ))}
-                      <span style={{ color: C.blue, fontSize: 11, marginLeft: 8, fontWeight: 600 }}>ver lista →</span>
+                      <span style={{ color: modAtiva.color, fontSize: 11, marginLeft: 8, fontWeight: 600 }}>ver lista →</span>
                     </div>
                   ) : (
                     <p style={{ margin: "10px 0 0", color: C.muted, fontSize: 12 }}>

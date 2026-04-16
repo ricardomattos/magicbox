@@ -29,7 +29,7 @@ export const usersApi = {
 // ── Horarios ──────────────────────────────────────────────────────────────────
 export const horariosApi = {
   // Concrete slots for a date
-  list: (date) => api.get(`/horarios/?data=${date}`),
+  list: (date, modalidade = "crossfit") => api.get(`/horarios/?data=${date}&modalidade=${modalidade}`),
   create: (data) => api.post("/horarios/create/", data),
   update: (id, data) => api.patch(`/horarios/${id}/`, data),
   delete: (id) => api.delete(`/horarios/${id}/`),
@@ -40,11 +40,11 @@ export const horariosApi = {
 
   // Templates (weekly schedule)
   templates: {
-    list: () => api.get("/horarios/templates/"),
+    list: (modalidade = "crossfit") => api.get(`/horarios/templates/?modalidade=${modalidade}`),
     create: (data) => api.post("/horarios/templates/", data),
     update: (id, data) => api.patch(`/horarios/templates/${id}/`, data),
     delete: (id) => api.delete(`/horarios/templates/${id}/`),
-    replicate: (dia_semana) => api.post("/horarios/templates/replicar/", { dia_semana }),
+    replicate: (dia_semana, modalidade = "crossfit") => api.post("/horarios/templates/replicar/", { dia_semana, modalidade }),
   },
 };
 

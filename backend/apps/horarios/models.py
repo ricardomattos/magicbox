@@ -1,17 +1,21 @@
 from django.db import models
 
 
+MODALIDADE_CHOICES = [("crossfit", "CrossFit"), ("hyrox", "Hyrox")]
+
+
 class HorarioTemplate(models.Model):
     """Reusable slot template per weekday (0=Mon … 6=Sun)."""
     dia_semana = models.IntegerField()   # 0=Mon, 6=Sun (Python weekday)
     hora = models.TimeField()
     vagas = models.PositiveIntegerField(default=12)
     ativo = models.BooleanField(default=True)
+    modalidade = models.CharField(max_length=10, choices=MODALIDADE_CHOICES, default="crossfit")
 
     class Meta:
         db_table = "horario_templates"
         ordering = ["dia_semana", "hora"]
-        unique_together = ("dia_semana", "hora")
+        unique_together = ("dia_semana", "hora", "modalidade")
 
     def __str__(self):
         dias = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"]
@@ -23,11 +27,12 @@ class Horario(models.Model):
     data = models.DateField()
     hora = models.TimeField()
     vagas = models.PositiveIntegerField(default=12)
+    modalidade = models.CharField(max_length=10, choices=MODALIDADE_CHOICES, default="crossfit")
 
     class Meta:
         db_table = "horarios"
         ordering = ["data", "hora"]
-        unique_together = ("data", "hora")
+        unique_together = ("data", "hora", "modalidade")
 
     def __str__(self):
         return f"{self.data} {self.hora.strftime('%H:%M')}"

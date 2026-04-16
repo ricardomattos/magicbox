@@ -40,6 +40,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "email", "name", "phone", "birth_date", "role", "plano", "password", "must_change_pass"]
 
+    def validate_email(self, value):
+        qs = User.objects.filter(email=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Este e-mail já está cadastrado.")
+        return value
+
     def create(self, validated_data):
         password = validated_data.pop("password")
         user = User(**validated_data)

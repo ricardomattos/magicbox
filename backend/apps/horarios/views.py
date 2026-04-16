@@ -28,10 +28,16 @@ def pode_fazer_checkin(user):
 
 # ── Templates ──────────────────────────────────────────────────────────────────
 class TemplateListCreateView(generics.ListCreateAPIView):
-    queryset = HorarioTemplate.objects.filter(ativo=True)
     serializer_class = HorarioTemplateSerializer
     permission_classes = [IsGestor]
     pagination_class = None
+
+    def get_queryset(self):
+        qs = HorarioTemplate.objects.filter(ativo=True)
+        modalidade = self.request.query_params.get("modalidade")
+        if modalidade in ("crossfit", "hyrox"):
+            qs = qs.filter(modalidade=modalidade)
+        return qs
 
 
 class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -46,17 +52,20 @@ class ReplicarTemplateView(APIView):
 
     def post(self, request):
         dia_origem = request.data.get("dia_semana")
+        modalidade = request.data.get("modalidade", "crossfit")
         if dia_origem is None:
             return Response({"detail": "dia_semana é obrigatório."}, status=400)
+        if modalidade not in ("crossfit", "hyrox"):
+            return Response({"detail": "modalidade inválida."}, status=400)
 
-        templates_origem = HorarioTemplate.objects.filter(dia_semana=dia_origem, ativo=True)
+        templates_origem = HorarioTemplate.objects.filter(dia_semana=dia_origem, modalidade=modalidade, ativo=True)
         criados = 0
         for d in range(5):  # 0=Mon to 4=Fri
             if d == dia_origem:
                 continue
             for t in templates_origem:
                 HorarioTemplate.objects.update_or_create(
-                    dia_semana=d, hora=t.hora,
+                    dia_semana=d, hora=t.hora, modalidade=modalidade,
                     defaults={"vagas": t.vagas, "ativo": True}
                 )
                 criados += 1
@@ -75,6 +84,10 @@ class HorarioListView(APIView):
 
     def get(self, request):
         data_str = request.query_params.get("data")
+        modalidade = request.query_params.get("modalidade", "crossfit")
+        if modalidade not in ("crossfit", "hyrox"):
+            modalidade = "crossfit"
+
         try:
             data = date.fromisoformat(data_str) if data_str else date.today()
         except ValueError:
@@ -82,15 +95,16 @@ class HorarioListView(APIView):
 
         # Python weekday(): Mon=0 … Sun=6 — matches HorarioTemplate.dia_semana
         dia_semana = data.weekday()
-        templates = HorarioTemplate.objects.filter(dia_semana=dia_semana, ativo=True)
+        templates = HorarioTemplate.objects.filter(dia_semana=dia_semana, modalidade=modalidade, ativo=True)
         for tmpl in templates:
             Horario.objects.get_or_create(
                 data=data,
                 hora=tmpl.hora,
+                modalidade=modalidade,
                 defaults={"vagas": tmpl.vagas},
             )
 
-        horarios = Horario.objects.filter(data=data).prefetch_related(
+        horarios = Horario.objects.filter(data=data, modalidade=modalidade).prefetch_related(
             "checkins__aluno__plano"
         )
 
