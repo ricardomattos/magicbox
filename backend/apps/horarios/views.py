@@ -144,25 +144,26 @@ class CheckinView(APIView):
                 status=403
             )
 
-        # Check if already has an active checkin today or tomorrow
+        # Check if already has an active checkin today or tomorrow for the same modality
         from datetime import date
         today = date.today()
         tomorrow = today + timedelta(days=1)
-        existing = Checkin.objects.filter(
-            aluno=request.user,
-            horario__data__in=[today, tomorrow],
-            ativo=True
-        ).first()
-        if existing:
-            return Response(
-                {"detail": "Você já tem um check-in ativo. Libere-o antes de reservar outro."},
-                status=400
-            )
-
         try:
             horario = Horario.objects.get(pk=horario_id)
         except Horario.DoesNotExist:
             return Response({"detail": "Horário não encontrado."}, status=404)
+
+        existing = Checkin.objects.filter(
+            aluno=request.user,
+            horario__data__in=[today, tomorrow],
+            horario__modalidade=horario.modalidade,
+            ativo=True
+        ).first()
+        if existing:
+            return Response(
+                {"detail": "Você já tem um check-in ativo nesta modalidade. Libere-o antes de reservar outro."},
+                status=400
+            )
 
         if horario.vagas_livres <= 0:
             return Response({"detail": "Sem vagas disponíveis."}, status=400)
