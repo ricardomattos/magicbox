@@ -7,10 +7,18 @@ class PlanoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Plano
-        fields = ["id", "nome", "frequencia", "valor", "cor", "ativo", "alunos_count"]
+        fields = ["id", "nome", "frequencia", "valor", "cor", "ativo",
+                  "tem_crossfit", "tem_hyrox", "alunos_count"]
 
     def get_alunos_count(self, obj):
         return obj.alunos.filter(is_active=True).count()
+
+    def validate(self, data):
+        tem_crossfit = data.get("tem_crossfit", getattr(self.instance, "tem_crossfit", False))
+        tem_hyrox = data.get("tem_hyrox", getattr(self.instance, "tem_hyrox", False))
+        if not tem_crossfit and not tem_hyrox:
+            raise serializers.ValidationError("Selecione ao menos uma modalidade (Crossfit ou Hyrox).")
+        return data
 
 
 class PagamentoSerializer(serializers.ModelSerializer):
