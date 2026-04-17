@@ -58,6 +58,7 @@ export const planosApi = {
   // Payments
   getPagamentos: (userId) => api.get(`/planos/pagamentos/${userId}/`),
   togglePagamento: (userId, mes) => api.post(`/planos/pagamentos/${userId}/`, { mes }),
+  resumo: () => api.get("/planos/resumo/"),
 };
 
 // ── Config ────────────────────────────────────────────────────────────────────

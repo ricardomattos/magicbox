@@ -1,3 +1,5 @@
+from datetime import date
+from django.db.models import Exists, OuterRef
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -72,3 +74,34 @@ class PagamentosAlunoView(APIView):
             return Response({"mes": mes, "pago": False})
 
         return Response({"mes": mes, "pago": True}, status=status.HTTP_201_CREATED)
+
+
+class ResumoView(APIView):
+    """GET /api/planos/resumo/ — dashboard summary for coaches."""
+    permission_classes = [IsGestor]
+
+    def get(self, request):
+        today = date.today()
+        cur_key = today.strftime("%Y-%m")
+        first_of_month = today.replace(day=1)
+
+        # Previous month key
+        if today.month == 1:
+            prev_key = f"{today.year - 1}-12"
+        else:
+            prev_key = f"{today.year}-{str(today.month - 1).zfill(2)}"
+
+        # Alunos registered before the current month who haven't paid the previous month
+        paid_prev = Pagamento.objects.filter(aluno=OuterRef("pk"), mes=prev_key)
+        inadimplentes_qs = (
+            User.objects
+            .filter(role="aluno", since__lt=first_of_month)
+            .exclude(Exists(paid_prev))
+            .values("id", "name")
+        )
+        inadimplentes = list(inadimplentes_qs)
+
+        return Response({
+            "inadimplentes_count": len(inadimplentes),
+            "inadimplentes": inadimplentes,
+        })
