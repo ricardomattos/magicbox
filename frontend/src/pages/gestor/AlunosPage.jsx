@@ -16,16 +16,46 @@ function isInadimplente(pagamentos, sinceKey) {
 }
 
 // ── Pagamentos Modal ──────────────────────────────────────────────────────────
-function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
+function PagamentosModal({ aluno, planos, onClose, onSavePagamentos }) {
   const [pagamentos, setPagamentos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [acting, setActing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [pendingToggles, setPendingToggles] = useState(new Set());
 
   useEffect(() => {
     planosApi.getPagamentos(aluno.id)
       .then(d => setPagamentos(d.meses_pagos || []))
       .finally(() => setLoading(false));
   }, [aluno.id]);
+
+  // Effective paid state = original XOR pending toggle
+  function isEfetivamentePago(key) {
+    const original = pagamentos.includes(key);
+    return pendingToggles.has(key) ? !original : original;
+  }
+
+  function togglePending(key) {
+    setPendingToggles(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }
+
+  async function salvar() {
+    if (pendingToggles.size === 0) { onClose(); return; }
+    setSaving(true);
+    try {
+      await Promise.all([...pendingToggles].map(key => planosApi.togglePagamento(aluno.id, key)));
+      const d = await planosApi.getPagamentos(aluno.id);
+      const novosMeses = d.meses_pagos || [];
+      setPagamentos(novosMeses);
+      setPendingToggles(new Set());
+      onSavePagamentos(aluno.id, novosMeses);
+      onClose();
+    } catch(e) { alert(e.message); }
+    finally { setSaving(false); }
+  }
 
   // Build month list: max(sinceKey, 2 months ago) → +12 months
   const now = new Date();
@@ -41,50 +71,37 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
   let endM=CUR_M+12,endY=CUR_Y; while(endM>11){endM-=12;endY++;}
   while(y<endY||(y===endY&&m<=endM)) {
     const key=`${y}-${String(m+1).padStart(2,"0")}`;
-    meses.push({key,month:m,year:y,pago:pagamentos.includes(key),isCurrentMonth:m===CUR_M&&y===CUR_Y,isPast:y<CUR_Y||(y===CUR_Y&&m<CUR_M)});
+    const pago = isEfetivamentePago(key);
+    const pending = pendingToggles.has(key);
+    meses.push({key,month:m,year:y,pago,pending,isCurrentMonth:m===CUR_M&&y===CUR_Y,isPast:y<CUR_Y||(y===CUR_Y&&m<CUR_M)});
     m++; if(m>11){m=0;y++;}
   }
 
-  async function toggle(key) {
-    setActing(true);
-    try {
-      await planosApi.togglePagamento(aluno.id, key);
-      const d = await planosApi.getPagamentos(aluno.id);
-      setPagamentos(d.meses_pagos || []);
-      onRefresh();
-    } catch(e) { alert(e.message); }
-    finally { setActing(false); }
-  }
-
-  async function darBaixaAtual() {
-    const key = curMonthKey();
-    if (!pagamentos.includes(key)) await toggle(key);
-  }
-
-  const mesAtualPago = pagamentos.includes(curMonthKey());
+  const mesAtualPago = isEfetivamentePago(curMonthKey());
+  const mesAtualPending = pendingToggles.has(curMonthKey());
   const prevKey = prevMonthKey();
+  const temAlteracoes = pendingToggles.size > 0;
 
-  // A month is "inadimplente" only if it's the previous month and unpaid
   function mesStatus(m) {
-    if (m.pago) return { label: "Pago", bg: C.successDim, border: C.success, sub: null };
-    if (m.isCurrentMonth) return { label: "Em aberto", bg: C.blueDim, border: C.blue, sub: null };
-    if (m.isPast && m.key === prevKey) return { label: "Em atraso", bg: C.dangerDim, border: C.danger, sub: "Mês anterior não pago" };
-    if (m.isPast) return { label: "Em aberto", bg: C.subtle, border: C.border, sub: null };
-    return { label: "Em aberto", bg: C.subtle, border: C.border, sub: null };
+    if (m.pago) return { label: "Pago", bg: C.successDim, border: m.pending ? C.warn : C.success, sub: null };
+    if (m.isCurrentMonth) return { label: "Em aberto", bg: C.blueDim, border: m.pending ? C.warn : C.blue, sub: null };
+    if (m.isPast && m.key === prevKey) return { label: "Em atraso", bg: m.pending ? C.subtle : C.dangerDim, border: m.pending ? C.warn : C.danger, sub: m.pending ? null : "Mês anterior não pago" };
+    if (m.isPast) return { label: "Em aberto", bg: C.subtle, border: m.pending ? C.warn : C.border, sub: null };
+    return { label: "Em aberto", bg: C.subtle, border: m.pending ? C.warn : C.border, sub: null };
   }
 
   return (
     <Modal onClose={onClose} title={`Pagamentos — ${aluno.name}`}
       contentStyle={{ maxHeight: "70vh", overflowY: "hidden", display: "flex", flexDirection: "column" }}>
       {/* Mês atual — fixo no topo */}
-      <div style={{ background: mesAtualPago ? C.successDim : C.blueDim, borderRadius: 14, padding: "14px 16px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ background: mesAtualPago ? C.successDim : C.blueDim, borderRadius: 14, padding: "14px 16px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, border: `1.5px solid ${mesAtualPending ? C.warn : "transparent"}` }}>
         <div>
           <p style={{ margin: 0, color: C.muted, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>Mês atual</p>
           <p style={{ margin: "2px 0 0", color: C.text, fontSize: 15, fontWeight: 700 }}>{MONTHS[CUR_M]} {CUR_Y}</p>
         </div>
-        {mesAtualPago
-          ? <Btn small variant="ghost" onClick={() => toggle(curMonthKey())} disabled={acting}>✓ Pago — Desfazer</Btn>
-          : <Btn small onClick={darBaixaAtual} disabled={acting}>Dar baixa</Btn>}
+        <Btn small variant={mesAtualPago ? "ghost" : undefined} onClick={() => togglePending(curMonthKey())} disabled={saving}>
+          {mesAtualPago ? "✓ Pago — Desfazer" : "Dar baixa"}
+        </Btn>
       </div>
 
       {/* Lista de meses — rolável */}
@@ -93,18 +110,20 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
           {meses.map(m => {
             const s = mesStatus(m);
             return (
-              <button key={m.key} onClick={() => !acting && toggle(m.key)}
+              <button key={m.key} onClick={() => !saving && togglePending(m.key)}
                 style={{ background: s.bg, border: `1.5px solid ${s.border}`, borderRadius: 14, padding: "12px 16px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", transition: "all 0.18s", flexShrink: 0 }}>
                 <div style={{ textAlign: "left" }}>
                   <p style={{ margin: 0, color: C.text, fontSize: 14, fontWeight: m.isCurrentMonth ? 700 : 400 }}>
                     {MONTHS[m.month]} {m.year}{m.isCurrentMonth ? " (atual)" : ""}
                   </p>
                   {s.sub && <p style={{ margin: "2px 0 0", color: C.danger, fontSize: 11 }}>{s.sub}</p>}
+                  {m.pending && <p style={{ margin: "2px 0 0", color: C.warn, fontSize: 11 }}>Alteração pendente</p>}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: m.pago ? C.success : m.key === prevKey && m.isPast ? C.danger : C.muted }}>{s.label}</span>
-                  <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${m.pago ? C.success : C.border}`, background: m.pago ? C.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${m.pago ? C.success : m.pending ? C.warn : C.border}`, background: m.pago ? C.success : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {m.pago && <span style={{ color: "#fff", fontSize: 11 }}>✓</span>}
+                    {!m.pago && m.pending && <span style={{ color: C.warn, fontSize: 11 }}>~</span>}
                   </div>
                 </div>
               </button>
@@ -113,9 +132,14 @@ function PagamentosModal({ aluno, planos, onClose, onRefresh }) {
         </div>
       )}
 
-      {/* Fechar — fixo no rodapé */}
-      <div style={{ flexShrink: 0 }}>
-        <Btn full variant="subtle" onClick={onClose}>Fechar</Btn>
+      {/* Ações — fixo no rodapé */}
+      <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+        {temAlteracoes && (
+          <Btn full onClick={salvar} disabled={saving}>
+            {saving ? "Salvando..." : `Salvar alterações (${pendingToggles.size})`}
+          </Btn>
+        )}
+        <Btn full variant="subtle" onClick={onClose} disabled={saving}>Fechar</Btn>
       </div>
     </Modal>
   );
@@ -518,7 +542,7 @@ export default function AlunosPage() {
 
       {editando && <AlunoForm title="Editar aluno" onSave={salvarEdicao} onCancel={() => setEditando(null)} form={form} setF={setF} editando={editando} planos={planos} err={err} />}
       {novoAluno && <AlunoForm title="Novo aluno" onSave={criarAluno} onCancel={() => setNovoAluno(false)} form={form} setF={setF} editando={null} planos={planos} err={err} inviteUrl={inviteUrl} inviteCopied={inviteCopied} onCopyLink={copiarLink} onRegenLink={regenerarLink} />}
-      {pagModal && <PagamentosModal aluno={pagModal} planos={planos} onClose={() => setPagModal(null)} onRefresh={loadAll} />}
+      {pagModal && <PagamentosModal aluno={pagModal} planos={planos} onClose={() => setPagModal(null)} onSavePagamentos={(userId, meses) => setPagamentosMap(prev => ({ ...prev, [userId]: meses }))} />}
       {resetConfirm && (
         <ConfirmModal
           label={`Resetar senha de ${resetConfirm.name}? Será redefinida para "1234" e o aluno deverá criar uma nova no próximo acesso.`}
