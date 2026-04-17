@@ -39,15 +39,14 @@ function dayLabel(dateISO, weekStart) {
 }
 
 // ── KPI Card ──────────────────────────────────────────────────────────────────
-function KpiCard({ label, value, sub, color = C.blue, icon }) {
+function KpiCard({ label, value, sub, color = C.blue }) {
   return (
     <div style={{
       background: C.card, borderRadius: 18, padding: "18px 20px",
       border: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 6,
     }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div>
         <p style={{ margin: 0, color: C.muted, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.6, fontWeight: 600 }}>{label}</p>
-        <span style={{ fontSize: 18 }}>{icon}</span>
       </div>
       <p style={{ margin: 0, color, fontSize: 32, fontWeight: 900, lineHeight: 1 }}>{value}</p>
       {sub && <p style={{ margin: 0, color: C.muted, fontSize: 12 }}>{sub}</p>}
@@ -273,7 +272,7 @@ export default function DashPage() {
     <div style={{ padding: mobile ? "0 18px 100px" : "0 32px 40px" }}>
       <div style={{ padding: mobile ? "calc(env(safe-area-inset-top) + 56px) 0 20px" : "28px 0 24px" }}>
         <h2 style={{ margin: 0, color: C.text, fontSize: 21, fontWeight: 900 }}>Dashboard</h2>
-        <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>Visão geral da Magic Box</p>
+        <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>Visão geral do Magicbox</p>
       </div>
 
       {loading ? <Spinner /> : (
@@ -285,10 +284,10 @@ export default function DashPage() {
             gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)",
             gap: 12,
           }}>
-            <KpiCard label="Total de alunos" value={alunos.length} icon="👥" color={C.text} sub="cadastrados" />
-            <KpiCard label="Novos este mês" value={novosMes} icon="🆕" color={C.blue} sub={novosMes > 0 ? "bem-vindos!" : "ainda nenhum"} />
-            <KpiCard label="Treinos este mês" value={totalTreinosMes} icon="💪" color={C.success} sub="check-ins ativos" />
-            <KpiCard label="1º acesso pendente" value={acessoPendente} icon="🔑" color={acessoPendente > 0 ? C.warn : C.muted} sub={acessoPendente > 0 ? "ainda não logaram" : "todos acessaram"} />
+            <KpiCard label="Total de alunos" value={alunos.length} color={C.text} sub="cadastrados" />
+            <KpiCard label="Novos este mês" value={novosMes} color={C.blue} sub={novosMes > 0 ? "bem-vindos!" : "ainda nenhum"} />
+            <KpiCard label="Treinos este mês" value={totalTreinosMes} color={C.success} sub="check-ins ativos" />
+            <KpiCard label="1º acesso pendente" value={acessoPendente} color={acessoPendente > 0 ? C.warn : C.muted} sub={acessoPendente > 0 ? "ainda não logaram" : "todos acessaram"} />
           </div>
 
           {/* Inadimplentes */}
