@@ -97,7 +97,7 @@ function TopFrequentesCard({ alunos }) {
     if (last && last.count === u.treinos_mes) last.group.push(u);
     else ranks.push({ count: u.treinos_mes, group: [u] });
   }
-  const topRanks = ranks.slice(0, 5);
+  const topRanks = ranks.slice(0, 3);
   const max = topRanks[0]?.count || 1;
 
   return (
