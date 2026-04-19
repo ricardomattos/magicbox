@@ -55,13 +55,50 @@ function KpiCard({ label, value, sub, color = C.blue }) {
 }
 
 // ── Seção: Top frequentes ──────────────────────────────────────────────────────
-function TopFrequentesCard({ alunos }) {
-  const top = [...alunos]
-    .filter(u => u.treinos_mes > 0)
-    .sort((a, b) => b.treinos_mes - a.treinos_mes)
-    .slice(0, 5);
+const MEDALS = ["🥇", "🥈", "🥉"];
+const AVATAR_SIZE = 32;
+const AVATAR_OVERLAP = 18;
 
-  const max = top[0]?.treinos_mes || 1;
+function StackedAvatars({ group }) {
+  const visible = group.slice(0, 3);
+  const extra = group.length - visible.length;
+  const width = AVATAR_SIZE + (visible.length - 1) * AVATAR_OVERLAP + (extra > 0 ? 22 : 0);
+  return (
+    <div style={{ position: "relative", width, height: AVATAR_SIZE, flexShrink: 0 }}>
+      {visible.map((u, ai) => (
+        <div key={u.id} style={{ position: "absolute", left: ai * AVATAR_OVERLAP, zIndex: visible.length - ai }}>
+          <Avatar name={u.name} size={AVATAR_SIZE} style={{ border: `2px solid ${C.card}`, boxSizing: "content-box" }} />
+        </div>
+      ))}
+      {extra > 0 && (
+        <div style={{
+          position: "absolute", left: visible.length * AVATAR_OVERLAP, zIndex: 0,
+          width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: "50%",
+          background: C.subtle, border: `2px solid ${C.card}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 10, fontWeight: 800, color: C.muted, boxSizing: "content-box",
+        }}>+{extra}</div>
+      )}
+    </div>
+  );
+}
+
+function TopFrequentesCard({ alunos }) {
+  const [expandedRank, setExpandedRank] = useState(null);
+
+  const sorted = [...alunos]
+    .filter(u => u.treinos_mes > 0)
+    .sort((a, b) => b.treinos_mes - a.treinos_mes);
+
+  // Agrupa empates em ranks
+  const ranks = [];
+  for (const u of sorted) {
+    const last = ranks[ranks.length - 1];
+    if (last && last.count === u.treinos_mes) last.group.push(u);
+    else ranks.push({ count: u.treinos_mes, group: [u] });
+  }
+  const topRanks = ranks.slice(0, 5);
+  const max = topRanks[0]?.count || 1;
 
   return (
     <div style={{ background: C.card, borderRadius: 18, padding: "18px 20px", border: `1px solid ${C.border}` }}>
@@ -73,25 +110,53 @@ function TopFrequentesCard({ alunos }) {
         </div>
       </div>
 
-      {top.length === 0 ? (
+      {topRanks.length === 0 ? (
         <p style={{ margin: 0, color: C.muted, fontSize: 13, textAlign: "center", padding: "16px 0" }}>Nenhum treino registrado ainda.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {top.map((u, i) => (
-            <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ width: 20, textAlign: "right", color: i === 0 ? C.warn : C.muted, fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}º`}
-              </span>
-              <Avatar name={u.name} size={32} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: "0 0 4px", color: C.text, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.name}</p>
-                <div style={{ height: 4, background: C.subtle, borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${(u.treinos_mes / max) * 100}%`, background: C.blue, borderRadius: 4, transition: "width 0.4s" }} />
+          {topRanks.map((rank, ri) => {
+            const tied = rank.group.length > 1;
+            const isOpen = expandedRank === ri;
+            return (
+              <div key={ri}>
+                <div
+                  onClick={() => tied && setExpandedRank(isOpen ? null : ri)}
+                  style={{ display: "flex", alignItems: "center", gap: 12, cursor: tied ? "pointer" : "default" }}
+                >
+                  <span style={{ width: 20, textAlign: "center", fontSize: 14, flexShrink: 0 }}>
+                    {ri < 3 ? MEDALS[ri] : `${ri + 1}º`}
+                  </span>
+
+                  <StackedAvatars group={rank.group} />
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: "0 0 4px", color: C.text, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {tied ? `${rank.group.length} empatados` : rank.group[0].name}
+                    </p>
+                    <div style={{ height: 4, background: C.subtle, borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${(rank.count / max) * 100}%`, background: C.blue, borderRadius: 4, transition: "width 0.4s" }} />
+                    </div>
+                  </div>
+
+                  <span style={{ color: C.blue, fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{rank.count}</span>
+                  {tied && (
+                    <span style={{ color: C.muted, fontSize: 14, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>▾</span>
+                  )}
                 </div>
+
+                {tied && isOpen && (
+                  <div style={{ marginTop: 8, marginLeft: 32, display: "flex", flexDirection: "column", gap: 6 }}>
+                    {rank.group.map(u => (
+                      <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 8, background: C.subtle, borderRadius: 10, padding: "6px 10px" }}>
+                        <Avatar name={u.name} size={26} />
+                        <span style={{ color: C.text, fontSize: 12 }}>{u.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <span style={{ color: C.blue, fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{u.treinos_mes}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
