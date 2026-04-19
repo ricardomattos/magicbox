@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { usersApi, planosApi } from "../../api/index.js";
-import { Avatar, Spinner, C, useIsMobile } from "../../components/ui.jsx";
+import { Avatar, Spinner, Modal, C, useIsMobile } from "../../components/ui.jsx";
 
 function curMonthKey() { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`; }
 
@@ -84,7 +84,7 @@ function StackedAvatars({ group }) {
 }
 
 function TopFrequentesCard({ alunos }) {
-  const [expandedRank, setExpandedRank] = useState(null);
+  const [modalRank, setModalRank] = useState(null);
 
   const sorted = [...alunos]
     .filter(u => u.treinos_mes > 0)
@@ -116,48 +116,49 @@ function TopFrequentesCard({ alunos }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {topRanks.map((rank, ri) => {
             const tied = rank.group.length > 1;
-            const isOpen = expandedRank === ri;
             return (
-              <div key={ri}>
-                <div
-                  onClick={() => tied && setExpandedRank(isOpen ? null : ri)}
-                  style={{ display: "flex", alignItems: "center", gap: 12, cursor: tied ? "pointer" : "default" }}
-                >
-                  <span style={{ width: 20, textAlign: "center", fontSize: 14, flexShrink: 0 }}>
-                    {ri < 3 ? MEDALS[ri] : `${ri + 1}º`}
-                  </span>
+              <div
+                key={ri}
+                onClick={() => tied && setModalRank(rank)}
+                style={{ display: "flex", alignItems: "center", gap: 12, cursor: tied ? "pointer" : "default" }}
+              >
+                <span style={{ width: 20, textAlign: "center", fontSize: 14, flexShrink: 0 }}>
+                  {ri < 3 ? MEDALS[ri] : `${ri + 1}º`}
+                </span>
 
-                  <StackedAvatars group={rank.group} />
+                <StackedAvatars group={rank.group} />
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: "0 0 4px", color: C.text, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {tied ? `${rank.group.length} empatados` : rank.group[0].name}
-                    </p>
-                    <div style={{ height: 4, background: C.subtle, borderRadius: 4, overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${(rank.count / max) * 100}%`, background: C.blue, borderRadius: 4, transition: "width 0.4s" }} />
-                    </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ margin: "0 0 4px", color: C.text, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {tied ? `${rank.group.length} empatados` : rank.group[0].name}
+                  </p>
+                  <div style={{ height: 4, background: C.subtle, borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${(rank.count / max) * 100}%`, background: C.blue, borderRadius: 4, transition: "width 0.4s" }} />
                   </div>
-
-                  <span style={{ color: C.blue, fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{rank.count}</span>
-                  {tied && (
-                    <span style={{ color: C.muted, fontSize: 14, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>▾</span>
-                  )}
                 </div>
 
-                {tied && isOpen && (
-                  <div style={{ marginTop: 8, marginLeft: 32, display: "flex", flexDirection: "column", gap: 6 }}>
-                    {rank.group.map(u => (
-                      <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 8, background: C.subtle, borderRadius: 10, padding: "6px 10px" }}>
-                        <Avatar name={u.name} size={26} />
-                        <span style={{ color: C.text, fontSize: 12 }}>{u.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <span style={{ color: C.blue, fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{rank.count}</span>
+                {tied && <span style={{ color: C.muted, fontSize: 16, flexShrink: 0 }}>›</span>}
               </div>
             );
           })}
         </div>
+      )}
+
+      {modalRank && (
+        <Modal
+          title={`${modalRank.group.length} empatados — ${modalRank.count} treino${modalRank.count !== 1 ? "s" : ""}`}
+          onClose={() => setModalRank(null)}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {modalRank.group.map(u => (
+              <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 10, background: C.subtle, borderRadius: 12, padding: "10px 14px" }}>
+                <Avatar name={u.name} size={32} />
+                <span style={{ color: C.text, fontSize: 14 }}>{u.name}</span>
+              </div>
+            ))}
+          </div>
+        </Modal>
       )}
     </div>
   );
