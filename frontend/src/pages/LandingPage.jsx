@@ -358,7 +358,7 @@ function About() {
               background: C.card,
             }}>
               <img
-                src="https://instagram.faqa4-1.fna.fbcdn.net/v/t51.75761-15/463125381_18460795846063502_6037901595199908398_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ig_cache_key=MzQ3OTAyMDY4OTEwMjg5NzM4Ng%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTc5OS5zZHIuQzMifQ%3D%3D&_nc_ohc=-MQSNhITlVoQ7kNvwH3sm1U&_nc_oc=AdrL9YArKIlf6x7w95ef7ixcKZKFXS6O9v7JzbbCkxYjrvOZCjvNLDCw28o1LNRx07c&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.faqa4-1.fna&_nc_gid=afBQudhwHvjcuyalAeKVNg&_nc_ss=7a32e&oh=00_Af2x3iohuKBsJAz0xfNwM0frkcak6igX8tnqGUk7hfJKoQ&oe=69E4D3B2"
+                src="/coach_photo.jpg"
                 alt="Magic Box Cross Training Araraquara"
                 style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.9 }}
                 loading="lazy"
