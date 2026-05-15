@@ -230,7 +230,7 @@ function InadimplentesCard({ resumo }) {
           <span style={{ fontSize: 22 }}>⚠️</span>
           <div style={{ textAlign: "left" }}>
             <p style={{ margin: 0, color: C.danger, fontSize: 15, fontWeight: 800 }}>{count} inadimplente{count !== 1 ? "s" : ""}</p>
-            <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>Mês atual em aberto</p>
+            <p style={{ margin: "2px 0 0", color: C.muted, fontSize: 12 }}>Mês anterior em aberto</p>
           </div>
         </div>
         <span style={{ color: C.muted, fontSize: 18, transition: "transform 0.2s", transform: expanded ? "rotate(180deg)" : "none" }}>▾</span>
