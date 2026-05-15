@@ -83,20 +83,13 @@ class ResumoView(APIView):
     def get(self, request):
         today = date.today()
         cur_key = today.strftime("%Y-%m")
-        first_of_month = today.replace(day=1)
 
-        # Previous month key
-        if today.month == 1:
-            prev_key = f"{today.year - 1}-12"
-        else:
-            prev_key = f"{today.year}-{str(today.month - 1).zfill(2)}"
-
-        # Alunos registered before the current month who haven't paid the previous month
-        paid_prev = Pagamento.objects.filter(aluno=OuterRef("pk"), mes=prev_key)
+        # Alunos who haven't paid the current month
+        paid_cur = Pagamento.objects.filter(aluno=OuterRef("pk"), mes=cur_key)
         inadimplentes_qs = (
             User.objects
-            .filter(role="aluno", since__lt=first_of_month)
-            .exclude(Exists(paid_prev))
+            .filter(role="aluno", is_active=True)
+            .exclude(Exists(paid_cur))
             .values("id", "name")
         )
         inadimplentes = list(inadimplentes_qs)
