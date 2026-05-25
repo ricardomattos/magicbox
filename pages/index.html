@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magic Box Cross Training — Araraquara</title>
+  <meta name="description" content="Cross training de alta performance em Araraquara. Resultados reais, comunidade forte.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b12;
+      --card: #0e1420;
+      --subtle: #131c2e;
+      --blue: #2979FF;
+      --blue-dim: rgba(41,121,255,0.14);
+      --blue-glow: rgba(41,121,255,0.35);
+      --text: #e8edf8;
+      --muted: #7a8ba0;
+      --border: rgba(41,121,255,0.14);
+      --border-light: rgba(255,255,255,0.06);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Navbar ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(8,11,18,0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .nav-logo span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800; font-size: 20px; color: #fff;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .nav-link {
+      color: var(--muted); font-size: 13px; font-weight: 600;
+      text-decoration: none; letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #fff; }
+    .btn-primary {
+      background: var(--blue); color: #fff;
+      padding: 8px 18px; border-radius: 10px;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+      text-decoration: none; transition: background 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #4a8fff; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: var(--bg);
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background-image: url('https://lh3.googleusercontent.com/p/AF1QipMF5u4dMjVJMSKld2O80n_y9JBwvqw-wRlppKhj=s1360-w1360-h1020-rw');
+      background-size: cover; background-position: center;
+      opacity: 0.25; filter: saturate(0.5);
+    }
+    .hero-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg, rgba(8,11,18,0.4) 0%, rgba(8,11,18,0.7) 60%, var(--bg) 100%);
+    }
+    .hero-glow {
+      position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
+      width: 600px; height: 600px; border-radius: 50%; z-index: 1;
+      background: radial-gradient(circle, rgba(41,121,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 2; text-align: center;
+      padding: 120px 24px 80px; max-width: 900px; margin: 0 auto;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .hero-content.visible { opacity: 1; transform: none; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-dim); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 16px; margin-bottom: 28px;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--blue); display: inline-block;
+    }
+    .hero-badge span {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .hero-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(56px, 12vw, 120px);
+      line-height: 0.9; letter-spacing: -2px;
+      color: #fff; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .hero-title-blue {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(56px, 12vw, 120px);
+      line-height: 0.9; letter-spacing: -2px;
+      text-transform: uppercase; margin-bottom: 32px; display: block;
+      background: linear-gradient(135deg, var(--blue) 0%, #66aaff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(20px, 4vw, 32px); font-weight: 500;
+      color: var(--text); letter-spacing: 1px; margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .hero-desc {
+      font-size: 16px; color: var(--muted); max-width: 500px;
+      margin: 0 auto 48px; line-height: 1.6;
+    }
+    .hero-ctas {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+      background: var(--blue); color: #fff;
+      padding: 16px 36px; border-radius: 14px;
+      font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+      text-decoration: none; text-transform: uppercase;
+      transition: all 0.2s;
+      box-shadow: 0 4px 24px var(--blue-glow);
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px var(--blue-glow);
+    }
+    .btn-hero-secondary {
+      background: transparent; color: var(--text);
+      padding: 16px 36px; border-radius: 14px;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.5px;
+      text-decoration: none; text-transform: uppercase;
+      border: 1.5px solid var(--border-light); transition: all 0.2s;
+    }
+    .btn-hero-secondary:hover {
+      border-color: var(--blue); color: var(--blue);
+    }
+    .scroll-indicator {
+      margin-top: 80px; display: flex; flex-direction: column;
+      align-items: center; gap: 8px; opacity: 0.5;
+    }
+    .scroll-indicator span {
+      font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(var(--blue), transparent);
+      animation: scrollPulse 1.5s ease-in-out infinite;
+    }
+
+    /* ── Stats ── */
+    .stats {
+      background: var(--blue); padding: 40px 24px;
+    }
+    .stats-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 48px; color: #fff;
+      line-height: 1; letter-spacing: -1px;
+    }
+    .stat-label {
+      font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500;
+      margin-top: 4px; letter-spacing: 0.5px;
+    }
+
+    /* ── Section header ── */
+    .section-eyebrow {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      letter-spacing: 3px; text-transform: uppercase;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(40px, 6vw, 72px);
+      color: #fff; line-height: 0.95; letter-spacing: -1px;
+      text-transform: uppercase; margin: 16px 0;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, var(--blue), #66aaff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── About ── */
+    .about {
+      background: var(--bg); padding: 100px 24px;
+    }
+    .about-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: center;
+    }
+    .about-image-wrap {
+      position: relative; border-radius: 24px; overflow: hidden;
+      aspect-ratio: 4/5; background: var(--card);
+    }
+    .about-image-wrap img {
+      width: 100%; height: 100%; object-fit: cover; opacity: 0.9;
+    }
+    .about-image-wrap::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,11,18,0.6) 0%, transparent 50%);
+    }
+    .about-text { display: flex; flex-direction: column; gap: 0; }
+    .about-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(36px, 5vw, 64px);
+      color: #fff; line-height: 0.95; letter-spacing: -1px;
+      text-transform: uppercase; margin: 16px 0 24px;
+    }
+    .about-title span {
+      background: linear-gradient(135deg, var(--blue), #66aaff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .about-p {
+      font-size: 16px; color: var(--muted); line-height: 1.8; margin-bottom: 20px;
+    }
+    .feature-list { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+    .feature-item { display: flex; align-items: center; gap: 14px; }
+    .feature-icon {
+      width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+      background: var(--blue-dim);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feature-item span { font-size: 15px; color: var(--text); font-weight: 500; }
+
+    /* ── Modalidades ── */
+    .modalidades {
+      position: relative; background: var(--card); padding: 100px 24px; overflow: hidden;
+    }
+    .modalidades-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://lh3.googleusercontent.com/p/AF1QipNqjz32oaedQ-UEBUEZbG481McxBpr7uTxiDiWd=s1360-w1360-h1020-rw');
+      background-size: cover; background-position: center;
+      opacity: 0.07; filter: saturate(0.3);
+    }
+    .modalidades-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-desc { font-size: 16px; color: var(--muted); max-width: 480px; margin: 0 auto; }
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
+    }
+    .mod-card {
+      border-radius: 20px; padding: 36px 36px 38px;
+      border: 1px solid var(--border-light);
+      background: rgba(14,20,32,0.85);
+      position: relative; overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .mod-card:hover {
+      transform: translateY(-4px);
+      background: var(--bg);
+    }
+    .mod-card.card-blue:hover { border-color: rgba(41,121,255,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(41,121,255,0.13); }
+    .mod-card.card-orange:hover { border-color: rgba(255,109,0,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+    .mod-accent {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      opacity: 0.4; transition: opacity 0.3s;
+    }
+    .mod-card.card-blue .mod-accent { background: linear-gradient(90deg, var(--blue), transparent); }
+    .mod-card.card-orange .mod-accent { background: linear-gradient(90deg, #ff6d00, transparent); }
+    .mod-card:hover .mod-accent { opacity: 1; }
+    .mod-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(40px, 5vw, 56px);
+      color: #fff; text-transform: uppercase;
+      letter-spacing: -0.5px; line-height: 0.95; margin-bottom: 16px;
+    }
+    .mod-desc { font-size: 15px; color: var(--muted); line-height: 1.7; }
+
+    /* ── Diferenciais ── */
+    .diferenciais { background: var(--bg); padding: 100px 24px; }
+    .diferenciais-inner { max-width: 1100px; margin: 0 auto; }
+    .diff-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;
+    }
+    .diff-card {
+      background: var(--subtle); border: 1px solid var(--border-light);
+      border-radius: 18px; padding: 28px 28px 30px;
+      transition: all 0.25s ease; position: relative; overflow: hidden;
+    }
+    .diff-card:hover { background: var(--card); transform: translateY(-3px); }
+    .diff-accent {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      opacity: 0; transition: opacity 0.25s;
+    }
+    .diff-card:hover .diff-accent { opacity: 1; }
+    .diff-icon {
+      width: 44px; height: 44px; border-radius: 12px; margin-bottom: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .diff-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800; font-size: 22px; color: #fff;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+    }
+    .diff-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--blue) 0%, #1a4fd6 100%);
+      padding: 80px 24px; position: relative; overflow: hidden;
+    }
+    .cta-pattern {
+      position: absolute; inset: 0; opacity: 0.07;
+      background-image: repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 20px);
+    }
+    .cta-inner {
+      max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 1;
+    }
+    .cta-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(36px, 6vw, 72px);
+      color: #fff; line-height: 0.95; letter-spacing: -1px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .cta-desc {
+      font-size: 17px; color: rgba(255,255,255,0.85);
+      margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto;
+      line-height: 1.6;
+    }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-cta-primary {
+      background: #fff; color: var(--blue);
+      padding: 16px 36px; border-radius: 14px;
+      font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+      text-decoration: none; text-transform: uppercase; transition: all 0.2s;
+    }
+    .btn-cta-primary:hover { transform: translateY(-2px); }
+    .btn-cta-secondary {
+      background: transparent; color: #fff;
+      padding: 16px 36px; border-radius: 14px;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.5px;
+      text-decoration: none; text-transform: uppercase;
+      border: 1.5px solid rgba(255,255,255,0.4); transition: all 0.2s;
+    }
+    .btn-cta-secondary:hover { border-color: #fff; }
+
+    /* ── Localização ── */
+    .localizacao { background: var(--card); padding: 100px 24px; }
+    .localizacao-inner { max-width: 1100px; margin: 0 auto; }
+    .loc-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;
+    }
+    .map-wrap {
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid var(--border-light); aspect-ratio: 4/3;
+    }
+    .map-wrap iframe { border: 0; display: block; width: 100%; height: 100%; }
+    .info-list { display: flex; flex-direction: column; gap: 28px; }
+    .info-item {
+      display: flex; gap: 18px; align-items: flex-start;
+      background: var(--bg); border-radius: 16px;
+      padding: 20px 22px; border: 1px solid var(--border-light);
+    }
+    .info-icon {
+      width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+      background: var(--blue-dim);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .info-label {
+      font-size: 11px; font-weight: 700; color: var(--blue);
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;
+    }
+    .info-value { font-size: 15px; color: var(--text); font-weight: 500; line-height: 1.6; }
+    .info-link {
+      font-size: 16px; color: var(--text); font-weight: 600; text-decoration: none; transition: color 0.2s;
+    }
+    .info-link:hover { color: var(--blue); }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg); border-top: 1px solid var(--border-light); padding: 40px 24px;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .footer-logo span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800; font-size: 17px; color: #fff; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .footer-copy { font-size: 13px; color: var(--muted); }
+    .footer-ig {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600;
+      transition: color 0.2s;
+    }
+    .footer-ig:hover { color: #fff; }
+
+    /* ── Reveal animation ── */
+    .reveal {
+      opacity: 0;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.from-up    { transform: translateY(40px); }
+    .reveal.from-left  { transform: translateX(-40px); }
+    .reveal.from-right { transform: translateX(40px); }
+    .reveal.visible    { opacity: 1; transform: none; }
+
+    /* ── Keyframes ── */
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+      50%       { opacity: 1;   transform: scaleY(1); }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      .nav-link { display: none; }
+      .about-grid { grid-template-columns: 1fr !important; gap: 40px; }
+      .loc-grid   { grid-template-columns: 1fr !important; }
+    }
+    @media (max-width: 480px) {
+      .nav-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" style="filter:drop-shadow(0 0 6px #2979FF);flex-shrink:0">
+        <polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5" fill="#2979FF"/>
+      </svg>
+      <span>Magic Box</span>
+    </a>
+    <div class="nav-links">
+      <a href="#modalidades" class="nav-link">Modalidades</a>
+      <a href="#localizacao" class="nav-link">Localização</a>
+      <a href="https://wa.me/5516992062787" target="_blank" rel="noopener noreferrer" class="btn-primary">Começar agora</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content" id="heroContent">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span>Araraquara, SP</span>
+      </div>
+      <h1 class="hero-title">Magic</h1>
+      <span class="hero-title-blue">Box</span>
+      <p class="hero-subtitle">Um Box como você nunca viu igual</p>
+      <p class="hero-desc">Cross training de alta performance em Araraquara. Resultados reais, comunidade forte.</p>
+      <div class="hero-ctas">
+        <a href="https://wa.me/5516992062787" target="_blank" rel="noopener noreferrer" class="btn-hero-primary">Começar agora</a>
+        <a href="#modalidades" class="btn-hero-secondary">Conhecer modalidades</a>
+      </div>
+      <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats ── -->
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat reveal from-up"><div class="stat-value">200+</div><div class="stat-label">Alunos ativos</div></div>
+      <div class="stat reveal from-up" data-delay="80"><div class="stat-value">3</div><div class="stat-label">Anos de história</div></div>
+      <div class="stat reveal from-up" data-delay="160"><div class="stat-value">20+</div><div class="stat-label">Aulas por semana</div></div>
+      <div class="stat reveal from-up" data-delay="240"><div class="stat-value">5★</div><div class="stat-label">Avaliação Google</div></div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section class="about">
+    <div class="about-grid">
+      <div class="reveal from-left">
+        <div class="about-image-wrap">
+          <img src="coach_photo.jpg" alt="Magic Box Cross Training Araraquara" loading="lazy">
+        </div>
+      </div>
+      <div>
+        <div class="reveal from-up">
+          <span class="section-eyebrow">Nossa missão</span>
+        </div>
+        <div class="reveal from-up" data-delay="50">
+          <h2 class="about-title">
+            Mudando vidas através do exercício e da
+            <span>relação humana</span>
+          </h2>
+        </div>
+        <div class="reveal from-up" data-delay="100">
+          <p class="about-p">A Magic Box Cross Training nasceu com um propósito simples e poderoso: transformar vidas. Não apenas físicamente — mas através das conexões genuínas que a comunidade do cross training proporciona.</p>
+        </div>
+        <div class="reveal from-up" data-delay="150">
+          <p class="about-p">Localizada em Araraquara, somos uma família de atletas, iniciantes e apaixonados pelo movimento. Cada aula é desafiadora, cada conquista é celebrada junto.</p>
+        </div>
+        <div class="reveal from-up" data-delay="200">
+          <div class="feature-list">
+            <div class="feature-item">
+              <div class="feature-icon">
+                <svg width="14" height="14" viewBox="0 0 32 32" fill="#2979FF"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+              </div>
+              <span>Comunidade acolhedora para todos os níveis</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <svg width="14" height="14" viewBox="0 0 32 32" fill="#2979FF"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+              </div>
+              <span>Programação WOD diária variada e desafiadora</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <svg width="14" height="14" viewBox="0 0 32 32" fill="#2979FF"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+              </div>
+              <span>Cross Training e Hyrox em um só lugar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Modalidades ── -->
+  <section class="modalidades" id="modalidades">
+    <div class="modalidades-bg"></div>
+    <div class="modalidades-inner">
+      <div class="section-header reveal from-up">
+        <span class="section-eyebrow">O que oferecemos</span>
+        <h2 class="section-title">Nossas Modalidades</h2>
+        <p class="section-desc">Do iniciante ao atleta avançado — temos o programa certo para você.</p>
+      </div>
+      <div class="cards-grid">
+        <div class="mod-card card-blue reveal from-up">
+          <div class="mod-accent"></div>
+          <h3 class="mod-title">Cross Training</h3>
+          <p class="mod-desc">Treinos funcionais de alta intensidade com variações diárias. Força, condicionamento e habilidade em cada WOD.</p>
+        </div>
+        <div class="mod-card card-orange reveal from-up" data-delay="100">
+          <div class="mod-accent"></div>
+          <h3 class="mod-title">Hyrox</h3>
+          <p class="mod-desc">Combinação de corrida e estações de exercícios funcionais — remo, ski erg, sandbag, wall balls e mais. Uma metodologia que desenvolve resistência, força e capacidade cardiovascular de forma completa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Diferenciais ── -->
+  <section class="diferenciais">
+    <div class="diferenciais-inner">
+      <div class="section-header reveal from-up">
+        <span class="section-eyebrow">Por que a Magic Box</span>
+        <h2 class="section-title">Um Box<br><span>diferente</span></h2>
+      </div>
+      <div class="diff-grid">
+        <div class="diff-card reveal from-up" data-delay="0">
+          <div class="diff-accent" style="background:#2979FF"></div>
+          <div class="diff-icon" style="background:rgba(41,121,255,0.1)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="#2979FF"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+          </div>
+          <h3 class="diff-title">Comunidade Real</h3>
+          <p class="diff-desc">Mais de 200 alunos que se motivam, comemoram conquistas e evoluem juntos todos os dias.</p>
+        </div>
+        <div class="diff-card reveal from-up" data-delay="60">
+          <div class="diff-accent" style="background:#ff6d00"></div>
+          <div class="diff-icon" style="background:rgba(255,109,0,0.1)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="#ff6d00"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+          </div>
+          <h3 class="diff-title">Hyrox Ready</h3>
+          <p class="diff-desc">Preparação específica para competições Hyrox. Do treino à largada, você vai estar pronto.</p>
+        </div>
+        <div class="diff-card reveal from-up" data-delay="120">
+          <div class="diff-accent" style="background:#00c853"></div>
+          <div class="diff-icon" style="background:rgba(0,200,83,0.1)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="#00c853"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+          </div>
+          <h3 class="diff-title">Programação Inteligente</h3>
+          <p class="diff-desc">WODs diários planejados com periodização para garantir evolução consistente e segura.</p>
+        </div>
+        <div class="diff-card reveal from-up" data-delay="0">
+          <div class="diff-accent" style="background:#ff6d00"></div>
+          <div class="diff-icon" style="background:rgba(255,109,0,0.1)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="#ff6d00"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+          </div>
+          <h3 class="diff-title">Estrutura Completa</h3>
+          <p class="diff-desc">Equipamentos de ponta, espaço amplo e ambiente climatizado para o melhor treino.</p>
+        </div>
+        <div class="diff-card reveal from-up" data-delay="60">
+          <div class="diff-accent" style="background:#e91e63"></div>
+          <div class="diff-icon" style="background:rgba(233,30,99,0.1)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="#e91e63"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+          </div>
+          <h3 class="diff-title">Para Todos os Níveis</h3>
+          <p class="diff-desc">Do seu primeiro pull-up ao pódio — cada movimento tem uma escala para o seu momento.</p>
+        </div>
+        <div class="diff-card reveal from-up" data-delay="120">
+          <div class="diff-accent" style="background:#00bcd4"></div>
+          <div class="diff-icon" style="background:rgba(0,188,212,0.1)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="#00bcd4"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
+          </div>
+          <h3 class="diff-title">Localização Privilegiada</h3>
+          <p class="diff-desc">No coração de Araraquara, fácil acesso e estacionamento. Sem desculpa para não vir.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA Banner ── -->
+  <section class="cta-banner">
+    <div class="cta-pattern"></div>
+    <div class="cta-inner">
+      <div class="reveal from-up">
+        <h2 class="cta-title">Pronto para começar<br>sua transformação?</h2>
+      </div>
+      <div class="reveal from-up" data-delay="100">
+        <p class="cta-desc">Sua primeira aula é por nossa conta. Venha conhecer a Magic Box e sentir a energia que só uma comunidade de verdade tem.</p>
+      </div>
+      <div class="reveal from-up" data-delay="200">
+        <div class="cta-btns">
+          <a href="https://wa.me/5516992062787" target="_blank" rel="noopener noreferrer" class="btn-cta-primary">Fale com a gente</a>
+          <a href="#localizacao" class="btn-cta-secondary">Ver localização</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Localização ── -->
+  <section class="localizacao" id="localizacao">
+    <div class="localizacao-inner">
+      <div class="section-header reveal from-up">
+        <span class="section-eyebrow">Onde estamos</span>
+        <h2 class="section-title">Localização</h2>
+      </div>
+      <div class="loc-grid">
+        <div class="reveal from-left">
+          <div class="map-wrap">
+            <iframe
+              title="Localização Magic Box Araraquara"
+              src="https://maps.google.com/maps?q=Av+Manuel+de+Abreu+1833+Araraquara+SP&output=embed"
+              allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+        <div class="reveal from-right" data-delay="100">
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#2979FF"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </div>
+              <div>
+                <div class="info-label">Endereço</div>
+                <div class="info-value">Av. Manuel de Abreu, 1833 B<br>Araraquara — SP</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="#2979FF" stroke-width="2"/>
+                  <path d="M12 6v6l4 2" stroke="#2979FF" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="info-label">Horário de funcionamento</div>
+                <div class="info-value">Segunda a Sexta: 6h — 21h<br>Sábado: 8h — 12h</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#2979FF"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </div>
+              <div>
+                <div class="info-label">Instagram</div>
+                <a href="https://www.instagram.com/magicbox.cross/" target="_blank" rel="noopener noreferrer" class="info-link">@magicbox.cross</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="footer-inner">
+      <a href="#" class="footer-logo">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" style="filter:drop-shadow(0 0 5px #2979FF);flex-shrink:0">
+          <polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5" fill="#2979FF"/>
+        </svg>
+        <span>Magic Box Cross Training</span>
+      </a>
+      <span class="footer-copy">© <span id="year"></span> Magic Box · Araraquara, SP</span>
+      <a href="https://www.instagram.com/magicbox.cross/" target="_blank" rel="noopener noreferrer" class="footer-ig">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        @magicbox.cross
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // Ano do footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // Hero fade-in
+    setTimeout(() => {
+      document.getElementById('heroContent').classList.add('visible');
+    }, 100);
+
+    // Scroll reveal com IntersectionObserver
+    document.querySelectorAll('.reveal[data-delay]').forEach(el => {
+      el.style.transitionDelay = el.dataset.delay + 'ms';
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
