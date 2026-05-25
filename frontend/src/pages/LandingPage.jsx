@@ -398,7 +398,7 @@ function About() {
           </Reveal>
           <Reveal delay={200}>
             <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, marginBottom: 20 }}>
-              A Magic Box Cross Training nasceu com um propósito simples e poderoso: transformar vidas. Não apenas físicamente — mas através das conexões genuínas que a comunidade do cross training proporciona.
+              O Magic Box Cross Training nasceu com um propósito simples e poderoso: transformar vidas. Não apenas físicamente — mas através das conexões genuínas que a comunidade do cross training proporciona.
             </p>
           </Reveal>
           <Reveal delay={250}>
@@ -549,8 +549,8 @@ const DIFFS = [
     color: C.blue,
   },
   {
-    title: "Hyrox Ready",
-    desc: "Preparação específica para competições Hyrox. Do treino à largada, você vai estar pronto.",
+    title: "Hyrox",
+    desc: "Uma metodologia que combina corrida e estações funcionais para desenvolver resistência, força e condicionamento de forma completa.",
     color: "#ff6d00",
   },
   {
@@ -565,7 +565,7 @@ const DIFFS = [
   },
   {
     title: "Para Todos os Níveis",
-    desc: "Do seu primeiro pull-up ao pódio — cada movimento tem uma escala para o seu momento.",
+    desc: "Nunca treinou antes? Sem problema. Cada movimento tem uma adaptação para o seu nível — do primeiro dia até onde você quiser chegar.",
     color: "#e91e63",
   },
   {
@@ -584,7 +584,7 @@ function Diferenciais() {
         <Reveal>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: C.blue, letterSpacing: 3, textTransform: "uppercase" }}>
-              Por que a Magic Box
+              Por que o Magic Box
             </span>
             <h2 style={{
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -686,7 +686,7 @@ function CTABanner() {
         </Reveal>
         <Reveal delay={100}>
           <p style={{ fontSize: 17, color: "rgba(255,255,255,0.85)", marginBottom: 40, maxWidth: 480, margin: "0 auto 40px" }}>
-            Sua primeira aula é por nossa conta. Venha conhecer a Magic Box e sentir a energia que só uma comunidade de verdade tem.
+            Sua primeira aula é por nossa conta. Venha conhecer o Magic Box e sentir a energia que só uma comunidade de verdade tem.
           </p>
         </Reveal>
         <Reveal delay={200}>
