@@ -312,39 +312,21 @@
     .irc-glow {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 700px; height: 400px; border-radius: 50%; pointer-events: none;
-      background: radial-gradient(ellipse, rgba(41,121,255,0.06) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(41,121,255,0.08) 0%, transparent 70%);
     }
     .irc-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
     .irc-header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 32px; margin-bottom: 64px;
+      text-align: center; margin-bottom: 64px;
     }
-    .irc-header-text { flex: 1; }
-    .irc-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: clamp(36px, 5vw, 64px);
-      color: #fff; line-height: 0.95; letter-spacing: -1px;
-      text-transform: uppercase; margin: 16px 0 20px;
+    .irc-logo-wrap {
+      display: flex; justify-content: center; margin: 28px 0 32px;
     }
-    .irc-title span {
-      background: linear-gradient(135deg, var(--blue), #66aaff);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    .irc-logo-wrap img { width: 260px; display: block; }
     .irc-desc {
-      font-size: 16px; color: var(--muted); line-height: 1.8; max-width: 520px;
+      font-size: 16px; color: var(--muted); line-height: 1.8;
+      max-width: 600px; margin: 0 auto;
     }
     .irc-desc strong { color: var(--text); font-weight: 600; }
-    .irc-logo-wrap {
-      flex-shrink: 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px 36px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 40px rgba(41,121,255,0.08);
-    }
-    .irc-logo-wrap img { width: 180px; display: block; }
     .irc-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
     }
@@ -368,7 +350,7 @@
     .irc-card-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
 
     /* ── Diferenciais ── */
-    .diferenciais { background: var(--bg); padding: 100px 24px; }
+    .diferenciais { background: var(--card); padding: 100px 24px; }
     .diferenciais-inner { max-width: 1100px; margin: 0 auto; }
     .diff-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;
@@ -510,8 +492,7 @@
       .nav-link { display: none; }
       .about-grid { grid-template-columns: 1fr !important; gap: 40px; }
       .loc-grid   { grid-template-columns: 1fr !important; }
-      .irc-header { flex-direction: column; }
-      .irc-logo-wrap img { width: 140px; }
+      .irc-logo-wrap img { width: 180px; }
       .irc-grid { grid-template-columns: 1fr !important; }
     }
     @media (max-width: 480px) {
@@ -656,16 +637,13 @@
     <div class="irc-glow"></div>
     <div class="irc-inner">
       <div class="irc-header reveal from-up">
-        <div class="irc-header-text">
-          <span class="section-eyebrow">Metodologia</span>
-          <h2 class="irc-title">Box <span>I.R.C. Partner</span></h2>
-          <p class="irc-desc">
-            O Magic Box é parceiro oficial da <strong>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa <strong>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
-          </p>
-        </div>
+        <span class="section-eyebrow">Parceiro Oficial</span>
         <div class="irc-logo-wrap">
           <img src="logo-partner.png" alt="I.R.C. Partner" loading="lazy">
         </div>
+        <p class="irc-desc">
+          O Magic Box é parceiro oficial da <strong>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa <strong>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
+        </p>
       </div>
       <div class="irc-grid">
         <div class="irc-card reveal from-up">
@@ -689,8 +667,8 @@
           <div class="irc-icon" style="background:rgba(0,200,83,0.1)">
             <svg width="20" height="20" viewBox="0 0 32 32" fill="#00c853"><polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5"/></svg>
           </div>
-          <h3 class="irc-card-title">Coaches Certificados I.R.C.</h3>
-          <p class="irc-card-desc">Nossa equipe é formada na metodologia I.R.C., garantindo que cada movimento seja corrigido e evoluído com técnica e segurança.</p>
+          <h3 class="irc-card-title">Coach Certificado I.R.C.</h3>
+          <p class="irc-card-desc">Formado na metodologia I.R.C., garantindo que cada movimento seja corrigido e evoluído com técnica e segurança.</p>
         </div>
       </div>
     </div>

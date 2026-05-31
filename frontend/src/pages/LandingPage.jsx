@@ -552,8 +552,8 @@ function IRCPartner() {
       color: "#9b59b6",
     },
     {
-      title: "Coaches Certificados I.R.C.",
-      desc: "Nossa equipe é formada na metodologia I.R.C., garantindo que cada movimento seja corrigido e evoluído com técnica e segurança.",
+      title: "Coach Certificado I.R.C.",
+      desc: "Formado na metodologia I.R.C., garantindo que cada movimento seja corrigido e evoluído com técnica e segurança.",
       color: "#00c853",
     },
   ];
@@ -564,62 +564,28 @@ function IRCPartner() {
       <div style={{
         position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
         width: 700, height: 400, borderRadius: "50%", pointerEvents: "none",
-        background: "radial-gradient(ellipse, rgba(41,121,255,0.06) 0%, transparent 70%)",
+        background: "radial-gradient(ellipse, rgba(41,121,255,0.08) 0%, transparent 70%)",
       }} />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Header */}
         <Reveal>
-          <div style={{
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            alignItems: isMobile ? "flex-start" : "center",
-            justifyContent: "space-between",
-            gap: 32,
-            marginBottom: 64,
-          }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: C.blue, letterSpacing: 3, textTransform: "uppercase" }}>
-                Metodologia
-              </span>
-              <h2 style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontWeight: 900, fontSize: "clamp(36px, 5vw, 64px)",
-                color: C.white, lineHeight: 0.95, letterSpacing: -1,
-                textTransform: "uppercase", margin: "16px 0 20px",
-              }}>
-                Box{" "}
-                <span style={{
-                  background: `linear-gradient(135deg, ${C.blue}, #66aaff)`,
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}>
-                  I.R.C. Partner
-                </span>
-              </h2>
-              <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, maxWidth: 520 }}>
-                O Magic Box é parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
-                <strong style={{ color: C.text }}>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
-              </p>
-            </div>
-
-            {/* Logo */}
-            <div style={{
-              flexShrink: 0,
-              background: C.card,
-              border: `1px solid ${C.border}`,
-              borderRadius: 24,
-              padding: "28px 36px",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: `0 0 40px rgba(41,121,255,0.08)`,
-            }}>
+          <div style={{ textAlign: "center", marginBottom: 64 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.blue, letterSpacing: 3, textTransform: "uppercase" }}>
+              Parceiro Oficial
+            </span>
+            <div style={{ display: "flex", justifyContent: "center", margin: "28px 0 32px" }}>
               <img
                 src="/logo-partner.png"
                 alt="I.R.C. Partner"
-                style={{ width: isMobile ? 140 : 180, display: "block" }}
+                style={{ width: isMobile ? 180 : 260, display: "block" }}
                 loading="lazy"
               />
             </div>
+            <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, maxWidth: 600, margin: "0 auto" }}>
+              O Magic Box é parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
+              <strong style={{ color: C.text }}>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
+            </p>
           </div>
         </Reveal>
 
@@ -711,7 +677,7 @@ function Diferenciais() {
   const [hover, setHover] = useState(null);
 
   return (
-    <section style={{ background: C.bg, padding: "100px 24px" }}>
+    <section style={{ background: C.card, padding: "100px 24px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <Reveal>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
