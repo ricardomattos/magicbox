@@ -402,14 +402,10 @@ function About() {
             </p>
           </Reveal>
           <Reveal delay={250}>
-            <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, marginBottom: 40 }}>
-              Localizada em Araraquara, somos uma família de atletas, iniciantes e apaixonados pelo movimento. Cada aula é desafiadora, cada conquista é celebrada junto.
-            </p>
-          </Reveal>
-          <Reveal delay={300}>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[
                 { icon: "★", text: "Comunidade acolhedora para todos os níveis" },
+                { icon: "★", text: "Treinos inéditos preparados com cuidado a cada semana" },
                 { icon: "★", text: "Programação WOD diária variada e desafiadora" },
                 { icon: "★", text: "Cross Training e Hyrox em um só lugar" },
               ].map((item, i) => (
@@ -446,7 +442,7 @@ const CLASSES = [
   {
     title: "Cross Training",
     desc: "Treinos funcionais de alta intensidade com variações diárias. Força, condicionamento e habilidade em cada WOD.",
-    img: "https://lh3.googleusercontent.com/p/AF1QipNqjz32oaedQ-UEBUEZbG481McxBpr7uTxiDiWd=s1360-w1360-h1020-rw",
+    img: "/athletes.webp",
     tagColor: C.blue,
   },
   {
@@ -465,7 +461,7 @@ function Modalidades() {
       {/* Background image — very faint */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 0,
-        backgroundImage: `url(https://lh3.googleusercontent.com/p/AF1QipNqjz32oaedQ-UEBUEZbG481McxBpr7uTxiDiWd=s1360-w1360-h1020-rw)`,
+        backgroundImage: `url(/athletes.webp)`,
         backgroundSize: "cover", backgroundPosition: "center",
         opacity: 0.07,
         filter: "saturate(0.3)",
@@ -531,6 +527,142 @@ function Modalidades() {
                 </h3>
                 <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, margin: 0 }}>
                   {cls.desc}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── IRC Partner ───────────────────────────────────────────────────────────────
+function IRCPartner() {
+  const isMobile = useIsMobile();
+  const benefits = [
+    {
+      title: "Progressão Ginástica Gradativa",
+      desc: "Do hollow body ao handstand push-up: cada movimento é ensinado em etapas, respeitando o seu nível atual e construindo a base para o próximo.",
+      color: C.blue,
+    },
+    {
+      title: "Força com o Peso do Corpo",
+      desc: "Front lever, back lever, muscle-up — habilidades que desenvolvem controle corporal real e transferem diretamente para os seus WODs.",
+      color: "#9b59b6",
+    },
+    {
+      title: "Coaches Certificados I.R.C.",
+      desc: "Nossa equipe é formada na metodologia I.R.C., garantindo que cada movimento seja corrigido e evoluído com técnica e segurança.",
+      color: "#00c853",
+    },
+  ];
+
+  return (
+    <section style={{ background: C.bg, padding: "100px 24px", position: "relative", overflow: "hidden" }}>
+      {/* Glow background */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+        width: 700, height: 400, borderRadius: "50%", pointerEvents: "none",
+        background: "radial-gradient(ellipse, rgba(41,121,255,0.06) 0%, transparent 70%)",
+      }} />
+
+      <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        {/* Header */}
+        <Reveal>
+          <div style={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "flex-start" : "center",
+            justifyContent: "space-between",
+            gap: 32,
+            marginBottom: 64,
+          }}>
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: C.blue, letterSpacing: 3, textTransform: "uppercase" }}>
+                Metodologia
+              </span>
+              <h2 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900, fontSize: "clamp(36px, 5vw, 64px)",
+                color: C.white, lineHeight: 0.95, letterSpacing: -1,
+                textTransform: "uppercase", margin: "16px 0 20px",
+              }}>
+                Box{" "}
+                <span style={{
+                  background: `linear-gradient(135deg, ${C.blue}, #66aaff)`,
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>
+                  I.R.C. Partner
+                </span>
+              </h2>
+              <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, maxWidth: 520 }}>
+                O Magic Box é parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
+                <strong style={{ color: C.text }}>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
+              </p>
+            </div>
+
+            {/* Logo */}
+            <div style={{
+              flexShrink: 0,
+              background: C.card,
+              border: `1px solid ${C.border}`,
+              borderRadius: 24,
+              padding: "28px 36px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: `0 0 40px rgba(41,121,255,0.08)`,
+            }}>
+              <img
+                src="/logo-partner.png"
+                alt="I.R.C. Partner"
+                style={{ width: isMobile ? 140 : 180, display: "block" }}
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Benefits grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+          gap: 16,
+        }}>
+          {benefits.map((b, i) => (
+            <Reveal key={i} delay={i * 100}>
+              <div style={{
+                background: C.subtle,
+                border: `1px solid ${C.borderLight}`,
+                borderRadius: 18,
+                padding: "28px 28px 30px",
+                position: "relative", overflow: "hidden",
+                height: "100%",
+              }}>
+                <div style={{
+                  position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                  background: b.color,
+                  opacity: 0.7,
+                }} />
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12, marginBottom: 18,
+                  background: b.color + "1a",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 32 32" fill={b.color}>
+                    <polygon points="16,2 19.5,12.5 30,12.5 21.5,19 24.5,29.5 16,23 7.5,29.5 10.5,19 2,12.5 12.5,12.5" />
+                  </svg>
+                </div>
+                <h3 style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 800, fontSize: 20, color: C.white,
+                  textTransform: "uppercase", letterSpacing: 0.5,
+                  margin: "0 0 10px",
+                }}>
+                  {b.title}
+                </h3>
+                <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.7, margin: 0 }}>
+                  {b.desc}
                 </p>
               </div>
             </Reveal>
@@ -904,6 +1036,7 @@ export default function LandingPage() {
       <Stats />
       <About />
       <Modalidades />
+      <IRCPartner />
       <Diferenciais />
       <CTABanner />
       <Localizacao />
