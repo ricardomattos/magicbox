@@ -237,7 +237,7 @@ function Hero() {
           opacity: titleVisible ? 1 : 0,
           transition: "opacity 0.7s ease 0.5s",
         }}>
-          Cross training de alta performance em Araraquara. Resultados reais, comunidade forte.
+          Resultados reais, comunidade forte.
         </p>
 
         <div style={{
@@ -667,11 +667,6 @@ const DIFFS = [
     color: C.blue,
   },
   {
-    title: "Hyrox",
-    desc: "Uma metodologia que combina corrida e estações funcionais para desenvolver resistência, força e condicionamento de forma completa.",
-    color: "#ff6d00",
-  },
-  {
     title: "Programação Inteligente",
     desc: "WODs diários planejados com periodização para garantir evolução consistente e segura.",
     color: "#00c853",
@@ -680,16 +675,6 @@ const DIFFS = [
     title: "Estrutura Completa",
     desc: "Equipamentos de ponta, espaço amplo e ambiente climatizado para o melhor treino.",
     color: "#ff6d00",
-  },
-  {
-    title: "Para Todos os Níveis",
-    desc: "Nunca treinou antes? Sem problema. Cada movimento tem uma adaptação para o seu nível — do primeiro dia até onde você quiser chegar.",
-    color: "#e91e63",
-  },
-  {
-    title: "Localização Privilegiada",
-    desc: "No coração de Araraquara, fácil acesso e estacionamento. Sem desculpa para não vir.",
-    color: "#00bcd4",
   },
 ];
 
