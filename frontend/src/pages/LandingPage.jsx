@@ -599,7 +599,7 @@ function IRCPartner() {
             <Reveal direction="right" delay={150}>
               <div style={{ borderRadius: 20, overflow: "hidden", aspectRatio: "3/4" }}>
                 <img
-                  src="/handstand_walk.webp"
+                  src="/handstand_walk.png"
                   alt="Ginástica I.R.C."
                   style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   loading="lazy"
