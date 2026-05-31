@@ -570,22 +570,42 @@ function IRCPartner() {
       <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Header */}
         <Reveal>
-          <div style={{ textAlign: "center", marginBottom: 64 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.blue, letterSpacing: 3, textTransform: "uppercase" }}>
-              Parceiro Oficial
-            </span>
-            <div style={{ display: "flex", justifyContent: "center", margin: "28px 0 32px" }}>
-              <img
-                src="/logo-partner.png"
-                alt="I.R.C. Partner"
-                style={{ width: isMobile ? 180 : 260, display: "block" }}
-                loading="lazy"
-              />
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+            gap: isMobile ? 40 : 64,
+            alignItems: "center",
+            marginBottom: 64,
+          }}>
+            {/* Left: logo + text */}
+            <div>
+              <span style={{ fontSize: 12, fontWeight: 700, color: C.blue, letterSpacing: 3, textTransform: "uppercase" }}>
+                Parceiro Oficial
+              </span>
+              <div style={{ margin: "24px 0 28px" }}>
+                <img
+                  src="/logo-partner.png"
+                  alt="I.R.C. Partner"
+                  style={{ width: isMobile ? 160 : 200, display: "block" }}
+                  loading="lazy"
+                />
+              </div>
+              <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8 }}>
+                Parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
+                <strong style={{ color: C.text }}>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
+              </p>
             </div>
-            <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, maxWidth: 600, margin: "0 auto" }}>
-              Parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
-              <strong style={{ color: C.text }}>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
-            </p>
+            {/* Right: image */}
+            <Reveal direction="right" delay={150}>
+              <div style={{ borderRadius: 20, overflow: "hidden", aspectRatio: "3/4" }}>
+                <img
+                  src="/handstand_walk.webp"
+                  alt="Ginástica I.R.C."
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  loading="lazy"
+                />
+              </div>
+            </Reveal>
           </div>
         </Reveal>
 
