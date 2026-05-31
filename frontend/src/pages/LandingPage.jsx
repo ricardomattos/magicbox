@@ -155,7 +155,7 @@ function Hero() {
       {/* Background image */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 0,
-        backgroundImage: `url(https://lh3.googleusercontent.com/p/AF1QipMF5u4dMjVJMSKld2O80n_y9JBwvqw-wRlppKhj=s1360-w1360-h1020-rw)`,
+        backgroundImage: `url(/box.webp)`,
         backgroundSize: "cover", backgroundPosition: "center",
         opacity: 0.25,
         filter: "saturate(0.5)",
@@ -448,7 +448,7 @@ const CLASSES = [
   {
     title: "Hyrox",
     desc: "Combinação de corrida e estações de exercícios funcionais — remo, ski erg, sandbag, wall balls e mais. Uma metodologia que desenvolve resistência, força e capacidade cardiovascular de forma completa.",
-    img: "https://lh3.googleusercontent.com/p/AF1QipMF5u4dMjVJMSKld2O80n_y9JBwvqw-wRlppKhj=s1360-w1360-h1020-rw",
+    img: "/box.webp",
     tagColor: "#ff6d00",
   },
 ];
