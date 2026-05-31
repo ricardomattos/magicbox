@@ -157,7 +157,7 @@ function Hero() {
         position: "absolute", inset: 0, zIndex: 0,
         backgroundImage: `url(/box.webp)`,
         backgroundSize: "cover", backgroundPosition: "center",
-        opacity: 0.25,
+        opacity: 0.45,
         filter: "saturate(0.5)",
       }} />
 
