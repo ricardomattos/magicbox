@@ -583,7 +583,7 @@ function IRCPartner() {
               />
             </div>
             <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.8, maxWidth: 600, margin: "0 auto" }}>
-              O Magic Box é parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
+              Parceiro oficial da <strong style={{ color: C.text }}>I.R.C.</strong> — a metodologia de ginástica aplicada ao fitness mais respeitada do Brasil, criada por Rafael Kilipper. I.R.C. significa{" "}
               <strong style={{ color: C.text }}>Insista, Resista, Conquiste</strong>: três etapas que guiam cada aluno da base ao alto rendimento.
             </p>
           </div>
